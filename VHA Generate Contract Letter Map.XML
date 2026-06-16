@@ -1,0 +1,1111 @@
+<?xml version="1.0" encoding="UTF-8"?><SiebelMessage
+ MessageId=""
+ IntObjectName="EAI Data Map"
+ MessageType="Integration Object"
+ IntObjectFormat="Siebel Hierarchical"
+><ListOfEaiDataMap
+><EaiObjectMap
+><Comments
+>06062025: RAJUD: changed from MSP Discount for R2.0 NSA changes,MonishaJ:Modified for MSP;MADHUR::09-MAY-23::Modified to add PlanValue for XS-NSA::Modified for BaseData and SharedData</Comments
+><DestinationObjectName
+>VHA Generate Contract Message</DestinationObjectName
+><Name
+>VHA Generate Contract Letter Map</Name
+><SourceObjectName
+>VHA Contract Doc Object</SourceObjectName
+><ListOfEaiComponentMap
+><EaiComponentMap
+><Comments
+></Comments
+><DestinationComponentName
+>Accessory</DestinationComponentName
+><DestinationValidation
+></DestinationValidation
+><Name
+>2_5</Name
+><ParentComponentMapName
+>Service</ParentComponentMapName
+><SourceComponentName
+>VHA Contract Doc Accessory</SourceComponentName
+><SourceSearchSpecification
+>[Type] = &apos;Accessory&apos; AND [Category] &lt;&gt; &apos;Secondary Device&apos;</SourceSearchSpecification
+><SourceValidation
+></SourceValidation
+><ListOfEaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>MonthlyRepayment</DestinationFieldName
+><SourceFieldExpression
+>IIF([Price Calc] = &quot;&quot; OR [Price Calc] = &quot;0&quot;, &quot;0.00&quot;, IIF(Instr(([Price Calc] - IIF([Prepayment Amount] = &quot;&quot;, 0, [Prepayment Amount])) / 36, &quot;.&quot;) &gt; 0, Left(([Price Calc] - IIF([Prepayment Amount] = &quot;&quot;, 0, [Prepayment Amount])) / 36, Instr(([Price Calc] - IIF([Prepayment Amount] = &quot;&quot;, 0, [Prepayment Amount])) / 36, &quot;.&quot;) + 2), ([Price Calc] - IIF([Prepayment Amount] = &quot;&quot;, 0, [Prepayment Amount])) / 36))</SourceFieldExpression
+></EaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>Price</DestinationFieldName
+><SourceFieldExpression
+>IIF([Price Calc] IS NOT NULL, &quot;$&quot;+[Price Calc],&quot;&quot;)</SourceFieldExpression
+></EaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>Name</DestinationFieldName
+><SourceFieldExpression
+>IIF([Out of Stock Indicator Flag] = &quot;Y&quot;,[Accessory Name]+&quot;*&quot;,[Accessory Name])</SourceFieldExpression
+></EaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>Term</DestinationFieldName
+><SourceFieldExpression
+>IIF([MonthlyRepayment] = &quot;0.00&quot;,&quot;-&quot;,IIF([Term Num] = 1, &quot;1 Month&quot;, IIF([Term Num] &gt; 1,IIf ([Term Override] &lt;&gt; &quot;_&quot;,[Term Override],[Term])+&quot; Months&quot;,[Term Num])))</SourceFieldExpression
+></EaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>Serial</DestinationFieldName
+><SourceFieldExpression
+>&quot;&quot;</SourceFieldExpression
+></EaiFieldMap
+></ListOfEaiFieldMap
+></EaiComponentMap
+><EaiComponentMap
+><Comments
+></Comments
+><DestinationComponentName
+>RollOverPrepay</DestinationComponentName
+><DestinationValidation
+></DestinationValidation
+><Name
+>2_3</Name
+><ParentComponentMapName
+>Service</ParentComponentMapName
+><SourceComponentName
+>VHA Contract Doc Service</SourceComponentName
+><SourceSearchSpecification
+>[Action Code] &lt;&gt; &apos;Delete&apos; AND [RollOverName] IS NOT NULL</SourceSearchSpecification
+><SourceValidation
+></SourceValidation
+><ListOfEaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>Name</DestinationFieldName
+><SourceFieldExpression
+>[RollOverName]</SourceFieldExpression
+></EaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>MonthlyRepayment</DestinationFieldName
+><SourceFieldExpression
+>IIF([RollOverMonthPay] IS NOT NULL, &quot;$&quot;+[RollOverMonthPay]+&quot; Incl. GST&quot;,&quot;&quot;)</SourceFieldExpression
+></EaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>Term</DestinationFieldName
+><SourceFieldExpression
+>[RollOverTerm]</SourceFieldExpression
+></EaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>Price</DestinationFieldName
+><SourceFieldExpression
+>IIF([RollOverTotal] IS NOT NULL, &quot;$&quot;+[RollOverTotal]+&quot; Incl. GST&quot;, [RollOverTotal])</SourceFieldExpression
+></EaiFieldMap
+></ListOfEaiFieldMap
+></EaiComponentMap
+><EaiComponentMap
+><Comments
+></Comments
+><DestinationComponentName
+>AddOn</DestinationComponentName
+><DestinationValidation
+></DestinationValidation
+><Name
+>2_2</Name
+><ParentComponentMapName
+>Service</ParentComponentMapName
+><SourceComponentName
+>VHA Contract Doc Simple Line Items</SourceComponentName
+><SourceSearchSpecification
+>[Global Product Identifier] = &apos;Add on&apos; AND [Action Code] = &apos;Add&apos; AND [NSA Flow] IS NULL</SourceSearchSpecification
+><SourceValidation
+></SourceValidation
+><ListOfEaiFieldMap
+><EaiFieldMap
+><Comments
+>Saravanan J: 12082020 Modified for digital TOT</Comments
+><DestinationFieldName
+>Term</DestinationFieldName
+><SourceFieldExpression
+>IIF([PeriodOverride] IS NOT NULL AND [PeriodOverride] &lt;&gt; &quot;_&quot;, IIF([PeriodOverride] = 1, &quot;1 Month&quot;, IIF([PeriodOverride] &gt; 1,[PeriodOverride]+&quot; Months&quot;,&quot;NA&quot;)), IIF([Period] = 1, &quot;1 Month&quot;, IIF([Period] &gt; 1,[Period]+&quot; Months&quot;,&quot;NA&quot;)))</SourceFieldExpression
+></EaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>Total</DestinationFieldName
+><SourceFieldExpression
+>&quot;&quot;</SourceFieldExpression
+></EaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>Name</DestinationFieldName
+><SourceFieldExpression
+>[Product Name]</SourceFieldExpression
+></EaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>MonthlyRepayment</DestinationFieldName
+><SourceFieldExpression
+>IIF([Max Price] IS NOT NULL, &quot;$&quot;+[Max Price],&quot;&quot;)</SourceFieldExpression
+></EaiFieldMap
+></ListOfEaiFieldMap
+></EaiComponentMap
+><EaiComponentMap
+><Comments
+>JS:24082020 Updated Spec for digital TOT.</Comments
+><DestinationComponentName
+>PreviousDiscount</DestinationComponentName
+><DestinationValidation
+></DestinationValidation
+><Name
+>1_1</Name
+><ParentComponentMapName
+>Service</ParentComponentMapName
+><SourceComponentName
+>VF Rewards</SourceComponentName
+><SourceSearchSpecification
+>([Global Product Identifier] = &apos;Recurring Discount&apos; OR [Global Product Identifier] = &apos;Credit&apos; OR [Global Product Identifier] = &apos;Bonus Data&apos; OR [Special Rating Type] = &apos;Loyalty Discount&apos; OR [Global Product Identifier] = &apos;Add on&apos; OR [Global Product Identifier] = &apos;Bonus IDD&apos;) AND [VF Available Offer.Invalidated Offer Flag] = &apos;Y&apos; AND [&amp;Flow] IS NULL</SourceSearchSpecification
+><SourceValidation
+></SourceValidation
+><ListOfEaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>Name</DestinationFieldName
+><SourceFieldExpression
+>[Product Name]</SourceFieldExpression
+></EaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>Term</DestinationFieldName
+><SourceFieldExpression
+>&quot;Cancelled&quot;</SourceFieldExpression
+></EaiFieldMap
+></ListOfEaiFieldMap
+></EaiComponentMap
+><EaiComponentMap
+><Comments
+>JS:24082020 Updated Spec for digital TOT.</Comments
+><DestinationComponentName
+>PreviousDiscount</DestinationComponentName
+><DestinationValidation
+></DestinationValidation
+><Name
+>1_2</Name
+><ParentComponentMapName
+>Service</ParentComponentMapName
+><SourceComponentName
+>VHA Contract Doc Simple Line Items</SourceComponentName
+><SourceSearchSpecification
+>([Global Product Identifier] = &apos;Recurring Discount&apos; OR [Global Product Identifier] = &apos;Credit&apos; OR [Global Product Identifier] = &apos;Bonus Data&apos; OR [Special Rating Type] = &apos;Loyalty Discount&apos; OR [Global Product Identifier] = &apos;Add on&apos; OR [Global Product Identifier] = &apos;Bonus IDD&apos;) AND [Action Code] = &apos;Delete&apos; AND [&amp;Flow] IS NULL</SourceSearchSpecification
+><SourceValidation
+></SourceValidation
+><ListOfEaiFieldMap
+><EaiFieldMap
+><Comments
+>Saravanan J: 12082020 Modified for digital TOT</Comments
+><DestinationFieldName
+>Term</DestinationFieldName
+><SourceFieldExpression
+>&quot;Cancelled&quot;</SourceFieldExpression
+></EaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>Name</DestinationFieldName
+><SourceFieldExpression
+>[Product Name]</SourceFieldExpression
+></EaiFieldMap
+></ListOfEaiFieldMap
+></EaiComponentMap
+><EaiComponentMap
+><Comments
+></Comments
+><DestinationComponentName
+>RollOverPrepay</DestinationComponentName
+><DestinationValidation
+></DestinationValidation
+><Name
+>2_4</Name
+><ParentComponentMapName
+>Service</ParentComponentMapName
+><SourceComponentName
+>VHA Contract Doc Service</SourceComponentName
+><SourceSearchSpecification
+>[Prepayment Amount] &gt; 0</SourceSearchSpecification
+><SourceValidation
+></SourceValidation
+><ListOfEaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>Name</DestinationFieldName
+><SourceFieldExpression
+>&quot;Pre-payment&quot;</SourceFieldExpression
+></EaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>Price</DestinationFieldName
+><SourceFieldExpression
+>&quot;$&quot;+IIF(InStr([Prepayment Amount],&quot;.&quot;) =0,ToChar([Prepayment Amount])+&quot;.00&quot;,ToChar([Prepayment Amount]))</SourceFieldExpression
+></EaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>Term</DestinationFieldName
+><SourceFieldExpression
+>&quot;NA&quot;</SourceFieldExpression
+></EaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>MonthlyRepayment</DestinationFieldName
+><SourceFieldExpression
+>&quot;NA&quot;</SourceFieldExpression
+></EaiFieldMap
+></ListOfEaiFieldMap
+></EaiComponentMap
+><EaiComponentMap
+><Comments
+></Comments
+><DestinationComponentName
+>LoyaltyDiscount</DestinationComponentName
+><DestinationValidation
+></DestinationValidation
+><Name
+>1_9</Name
+><ParentComponentMapName
+>Service</ParentComponentMapName
+><SourceComponentName
+>VHA Contract Doc Simple Line Items</SourceComponentName
+><SourceSearchSpecification
+>[Special Rating Type] = &apos;Loyalty Discount&apos; AND [Action Code] = &apos;Add&apos; AND [NSA Flow] IS NULL</SourceSearchSpecification
+><SourceValidation
+></SourceValidation
+><ListOfEaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>DiscountPrice</DestinationFieldName
+><SourceFieldExpression
+>IIF([Discount Price] IS NOT NULL,&quot;$&quot;+[Discount Price],&quot;NA&quot;)</SourceFieldExpression
+></EaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>Name</DestinationFieldName
+><SourceFieldExpression
+>[Product Name]</SourceFieldExpression
+></EaiFieldMap
+><EaiFieldMap
+><Comments
+>Saravanan J: 12082020 Modified for digital TOT</Comments
+><DestinationFieldName
+>Term</DestinationFieldName
+><SourceFieldExpression
+>IIF([PeriodOverride] IS NOT NULL AND [PeriodOverride] &lt;&gt; &quot;_&quot;, IIF([PeriodOverride] = 1, &quot;1 Month&quot;, IIF([PeriodOverride] &gt; 1,[PeriodOverride]+&quot; Months&quot;,&quot;Month to Month&quot;)), IIF([Period] = 1, &quot;1 Month&quot;, IIF([Period] &gt; 1,[Period]+&quot; Months&quot;,&quot;Month to Month&quot;)))</SourceFieldExpression
+></EaiFieldMap
+></ListOfEaiFieldMap
+></EaiComponentMap
+><EaiComponentMap
+><Comments
+></Comments
+><DestinationComponentName
+>Bonus</DestinationComponentName
+><DestinationValidation
+></DestinationValidation
+><Name
+>1_7</Name
+><ParentComponentMapName
+>Service</ParentComponentMapName
+><SourceComponentName
+>VHA Contract Doc Simple Line Items</SourceComponentName
+><SourceSearchSpecification
+>([Global Product Identifier] = &apos;Bonus Data&apos; OR [Global Product Identifier] = &apos;Bonus IDD&apos;) AND [Action Code] = &apos;Add&apos; AND [NSA Flow] IS NULL</SourceSearchSpecification
+><SourceValidation
+></SourceValidation
+><ListOfEaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>Name</DestinationFieldName
+><SourceFieldExpression
+>[Product Name]</SourceFieldExpression
+></EaiFieldMap
+><EaiFieldMap
+><Comments
+>Saravanan J: 12082020 Modified for digital TOT</Comments
+><DestinationFieldName
+>Term</DestinationFieldName
+><SourceFieldExpression
+>IIF([PeriodOverride] IS NOT NULL AND [PeriodOverride] &lt;&gt; &quot;_&quot;, IIF([PeriodOverride] = 1, &quot;1 Month&quot;, IIF([PeriodOverride] &gt; 1,[PeriodOverride]+&quot; Months&quot;,&quot;Month to Month&quot;)), IIF([Period] = 1, &quot;1 Month&quot;, IIF([Period] &gt; 1,[Period]+&quot; Months&quot;,&quot;Month to Month&quot;)))</SourceFieldExpression
+></EaiFieldMap
+></ListOfEaiFieldMap
+></EaiComponentMap
+><EaiComponentMap
+><Comments
+></Comments
+><DestinationComponentName
+>Credit</DestinationComponentName
+><DestinationValidation
+></DestinationValidation
+><Name
+>1_4</Name
+><ParentComponentMapName
+>Service</ParentComponentMapName
+><SourceComponentName
+>VHA Contract Doc Simple Line Items</SourceComponentName
+><SourceSearchSpecification
+>([Global Product Identifier] = &apos;Recurring Discount&apos; OR [Global Product Identifier] = &apos;Credit&apos;) AND [Action Code] = &apos;Add&apos; AND [NSA Flow] IS NULL</SourceSearchSpecification
+><SourceValidation
+></SourceValidation
+><ListOfEaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>DiscountPrice</DestinationFieldName
+><SourceFieldExpression
+>IIF([Discount Price] IS NOT NULL,&quot;$&quot;+[Discount Price],&quot;NA&quot;)</SourceFieldExpression
+></EaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>Name</DestinationFieldName
+><SourceFieldExpression
+>[Product Name]</SourceFieldExpression
+></EaiFieldMap
+><EaiFieldMap
+><Comments
+>Saravanan J: 12082020 Modified for digital TOT</Comments
+><DestinationFieldName
+>Term</DestinationFieldName
+><SourceFieldExpression
+>IIF([PeriodOverride] IS NOT NULL AND [PeriodOverride] &lt;&gt; &quot;_&quot;, IIF([PeriodOverride] = 1, &quot;1 Month&quot;, IIF([PeriodOverride] &gt; 1,[PeriodOverride]+&quot; Months&quot;,&quot;Month to Month&quot;)), IIF([Period] = 1, &quot;1 Month&quot;, IIF([Period] &gt; 1,[Period]+&quot; Months&quot;,&quot;Month to Month&quot;)))</SourceFieldExpression
+></EaiFieldMap
+></ListOfEaiFieldMap
+></EaiComponentMap
+><EaiComponentMap
+><Comments
+></Comments
+><DestinationComponentName
+>Bonus</DestinationComponentName
+><DestinationValidation
+></DestinationValidation
+><Name
+>1_6</Name
+><ParentComponentMapName
+>Service</ParentComponentMapName
+><SourceComponentName
+>VF Rewards</SourceComponentName
+><SourceSearchSpecification
+>([Global Product Identifier] = &apos;Bonus Data&apos; OR [Global Product Identifier] = &apos;Bonus IDD&apos;) AND [VF Available Offer.Status] = &apos;Pending&apos;</SourceSearchSpecification
+><SourceValidation
+></SourceValidation
+><ListOfEaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>Name</DestinationFieldName
+><SourceFieldExpression
+>[Product Name]</SourceFieldExpression
+></EaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>Term</DestinationFieldName
+><SourceFieldExpression
+>IIF([Period] = 1, &quot;1 Month&quot;, IIF([Period] &gt; 1,[Period]+&quot; Months&quot;,&quot;Month to Month&quot;))</SourceFieldExpression
+></EaiFieldMap
+></ListOfEaiFieldMap
+></EaiComponentMap
+><EaiComponentMap
+><Comments
+></Comments
+><DestinationComponentName
+>Credit</DestinationComponentName
+><DestinationValidation
+></DestinationValidation
+><Name
+>1_3</Name
+><ParentComponentMapName
+>Service</ParentComponentMapName
+><SourceComponentName
+>VF Rewards</SourceComponentName
+><SourceSearchSpecification
+>([Global Product Identifier] = &apos;Recurring Discount&apos; OR [Global Product Identifier] = &apos;Credit&apos;) AND [VF Available Offer.Status] = &apos;Pending&apos;</SourceSearchSpecification
+><SourceValidation
+></SourceValidation
+><ListOfEaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>Name</DestinationFieldName
+><SourceFieldExpression
+>[Product Name]</SourceFieldExpression
+></EaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>Term</DestinationFieldName
+><SourceFieldExpression
+>IIF([Period] = 1, &quot;1 Month&quot;, IIF([Period] &gt; 1,[Period]+&quot; Months&quot;,&quot;Month to Month&quot;))</SourceFieldExpression
+></EaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>DiscountPrice</DestinationFieldName
+><SourceFieldExpression
+>IIF([Discount Price] IS NOT NULL,&quot;$&quot;+[Discount Price],&quot;NA&quot;)</SourceFieldExpression
+></EaiFieldMap
+></ListOfEaiFieldMap
+></EaiComponentMap
+><EaiComponentMap
+><Comments
+>17072025:RAJUD:Change the Target from Bonus to Credit CM-3837</Comments
+><DestinationComponentName
+>Credit</DestinationComponentName
+><DestinationValidation
+></DestinationValidation
+><Name
+>1_5_1</Name
+><ParentComponentMapName
+>Service</ParentComponentMapName
+><SourceComponentName
+>VHA Contract Doc MSP Line Items</SourceComponentName
+><SourceSearchSpecification
+>[IntegrationId] IS NOT NULL AND [ActionCd] &lt;&gt; &apos;Delete&apos;</SourceSearchSpecification
+><SourceValidation
+></SourceValidation
+><ListOfEaiFieldMap
+><EaiFieldMap
+><Comments
+>06062025: RAJUD: changed from MSP Discount for R2.0 NSA changes</Comments
+><DestinationFieldName
+>Name</DestinationFieldName
+><SourceFieldExpression
+>&quot;Bundle and Save&quot;</SourceFieldExpression
+></EaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>DiscountPrice</DestinationFieldName
+><SourceFieldExpression
+>&quot;$&quot;+[AdjustedListPrice]</SourceFieldExpression
+></EaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>Term</DestinationFieldName
+><SourceFieldExpression
+>&quot;Month to Month&quot;</SourceFieldExpression
+></EaiFieldMap
+></ListOfEaiFieldMap
+></EaiComponentMap
+><EaiComponentMap
+><Comments
+></Comments
+><DestinationComponentName
+>LoyaltyDiscount</DestinationComponentName
+><DestinationValidation
+></DestinationValidation
+><Name
+>1_8</Name
+><ParentComponentMapName
+>Service</ParentComponentMapName
+><SourceComponentName
+>VF Rewards</SourceComponentName
+><SourceSearchSpecification
+>[Special Rating Type] = &apos;Loyalty Discount&apos; AND [VF Available Offer.Status] = &apos;Pending&apos;</SourceSearchSpecification
+><SourceValidation
+></SourceValidation
+><ListOfEaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>Term</DestinationFieldName
+><SourceFieldExpression
+>IIF([Period] = 1, &quot;1 Month&quot;, IIF([Period] &gt; 1,[Period]+&quot; Months&quot;,&quot;Month to Month&quot;))</SourceFieldExpression
+></EaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>Name</DestinationFieldName
+><SourceFieldExpression
+>[Product Name]</SourceFieldExpression
+></EaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>DiscountPrice</DestinationFieldName
+><SourceFieldExpression
+>IIF([Discount Price] IS NOT NULL,&quot;$&quot;+[Discount Price],&quot;NA&quot;)</SourceFieldExpression
+></EaiFieldMap
+></ListOfEaiFieldMap
+></EaiComponentMap
+><EaiComponentMap
+><Comments
+></Comments
+><DestinationComponentName
+>AddOn</DestinationComponentName
+><DestinationValidation
+></DestinationValidation
+><Name
+>2_1</Name
+><ParentComponentMapName
+>Service</ParentComponentMapName
+><SourceComponentName
+>VF Rewards</SourceComponentName
+><SourceSearchSpecification
+>[Global Product Identifier] = &apos;Add on&apos; AND [VF Available Offer.Status] = &apos;Pending&apos;</SourceSearchSpecification
+><SourceValidation
+></SourceValidation
+><ListOfEaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>MonthlyRepayment</DestinationFieldName
+><SourceFieldExpression
+>IIF([Max Price] IS NOT NULL, &quot;$&quot;+[Max Price],&quot;&quot;)</SourceFieldExpression
+></EaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>Name</DestinationFieldName
+><SourceFieldExpression
+>[Product Name]</SourceFieldExpression
+></EaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>Term</DestinationFieldName
+><SourceFieldExpression
+>IIF([Period] = 1, &quot;1 Month&quot;, IIF([Period] &gt; 1,[Period]+&quot; Months&quot;,&quot;NA&quot;))</SourceFieldExpression
+></EaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>Total</DestinationFieldName
+><SourceFieldExpression
+>&quot;&quot;</SourceFieldExpression
+></EaiFieldMap
+></ListOfEaiFieldMap
+></EaiComponentMap
+><EaiComponentMap
+><Comments
+></Comments
+><DestinationComponentName
+>Bonus</DestinationComponentName
+><DestinationValidation
+></DestinationValidation
+><Name
+>1_5</Name
+><ParentComponentMapName
+>Service</ParentComponentMapName
+><SourceComponentName
+>VHA Bundle Save Offers BC</SourceComponentName
+><SourceSearchSpecification
+>[New PD] IS NOT NULL</SourceSearchSpecification
+><SourceValidation
+></SourceValidation
+><ListOfEaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>DiscountPrice</DestinationFieldName
+><SourceFieldExpression
+>IIF([Discount Price] IS NOT NULL,&quot;$&quot;+[Discount Price],&quot;NA&quot;)</SourceFieldExpression
+></EaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>Name</DestinationFieldName
+><SourceFieldExpression
+>IIF([New PD] IS NOT NULL, [New PD]+&quot;% Bundle &amp; Save&quot;, &quot;&quot;)</SourceFieldExpression
+></EaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>Term</DestinationFieldName
+><SourceFieldExpression
+>IIF([New PD] IS NOT NULL,&quot;Month to Month&quot;, &quot;&quot;)</SourceFieldExpression
+></EaiFieldMap
+></ListOfEaiFieldMap
+></EaiComponentMap
+><EaiComponentMap
+><Comments
+></Comments
+><DestinationComponentName
+>Device</DestinationComponentName
+><DestinationValidation
+></DestinationValidation
+><Name
+>2_7</Name
+><ParentComponentMapName
+>Service</ParentComponentMapName
+><SourceComponentName
+>VHA Contract Doc Device</SourceComponentName
+><SourceSearchSpecification
+>[Action Code] = &apos;Add&apos; AND [Item Name] IS NOT NULL</SourceSearchSpecification
+><SourceValidation
+></SourceValidation
+><ListOfEaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>IMEI</DestinationFieldName
+><SourceFieldExpression
+>[IMEI]</SourceFieldExpression
+></EaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>Term</DestinationFieldName
+><SourceFieldExpression
+>IIF([Monthly Repayment Calc] = &quot;0.00&quot;,&quot;-&quot;,IIF([Term Num] = 1, &quot;1 Month&quot;, IIF([Term Num] &gt; 1,IIf ([Term Override] &lt;&gt; &quot;_&quot;,[Term Override],[Term])+&quot; Months&quot;,[Term Num])))</SourceFieldExpression
+></EaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>MonthlyRepayment</DestinationFieldName
+><SourceFieldExpression
+>[Monthly Repayment]</SourceFieldExpression
+></EaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>Name</DestinationFieldName
+><SourceFieldExpression
+>IIF([Out of Stock Indicator Flag] = &quot;Y&quot;,[Item Name]+&quot;*&quot;,[Item Name])</SourceFieldExpression
+></EaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>Insurance</DestinationFieldName
+><SourceFieldExpression
+>[Insurance]</SourceFieldExpression
+></EaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>Price</DestinationFieldName
+><SourceFieldExpression
+>IIF([Item Name] IS NOT NULL,IIF([Contract Amount Num] IS NOT NULL, &quot;$&quot;+[Contract Amount Num]+&quot; Incl. GST&quot;,&quot;&quot;),&quot;&quot;)</SourceFieldExpression
+></EaiFieldMap
+></ListOfEaiFieldMap
+></EaiComponentMap
+><EaiComponentMap
+><Comments
+></Comments
+><DestinationComponentName
+>Header</DestinationComponentName
+><DestinationValidation
+></DestinationValidation
+><Name
+>Header</Name
+><ParentComponentMapName
+></ParentComponentMapName
+><SourceComponentName
+>VHA Contract Doc Header</SourceComponentName
+><SourceSearchSpecification
+></SourceSearchSpecification
+><SourceValidation
+></SourceValidation
+><ListOfEaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>DOM</DestinationFieldName
+><SourceFieldExpression
+>[DOM]</SourceFieldExpression
+></EaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>ABNACN</DestinationFieldName
+><SourceFieldExpression
+>IIF([ABN ACN Number] IS NOT NULL,&quot;ABN/ACN &quot;+[ABN ACN Number],[ABN ACN Number])</SourceFieldExpression
+></EaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>CustomerName</DestinationFieldName
+><SourceFieldExpression
+>[Customer Name]</SourceFieldExpression
+></EaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>Date</DestinationFieldName
+><SourceFieldExpression
+>IIF([Req Ship Dt] IS NOT NULL,Right(Left([Req Ship Dt],5),2)+&quot;/&quot;+Left([Req Ship Dt],2)+&quot;/&quot;+Right(Left([Req Ship Dt],10),4),Right(Left(Today(),5),2)+&quot;/&quot;+Left(Today(),2)+&quot;/&quot;+Right(Today(),4))</SourceFieldExpression
+></EaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>DeliveryAddress</DestinationFieldName
+><SourceFieldExpression
+>IIF([&amp;ShipAddress] &lt;&gt; &quot;N/A&quot;, [&amp;ShipAddress], &quot;NA&quot;)</SourceFieldExpression
+></EaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>RegisteredCompany</DestinationFieldName
+><SourceFieldExpression
+>[Company Name]</SourceFieldExpression
+></EaiFieldMap
+></ListOfEaiFieldMap
+></EaiComponentMap
+><EaiComponentMap
+><Comments
+>MADHUR::09-MAY-23::Modified to add PlanValue for XS-NSA</Comments
+><DestinationComponentName
+>Service</DestinationComponentName
+><DestinationValidation
+></DestinationValidation
+><Name
+>Service</Name
+><ParentComponentMapName
+>Header</ParentComponentMapName
+><SourceComponentName
+>VHA Contract Doc Service</SourceComponentName
+><SourceSearchSpecification
+>[Action Code] &lt;&gt; &apos;Delete&apos;</SourceSearchSpecification
+><SourceValidation
+></SourceValidation
+><ListOfEaiFieldMap
+><EaiFieldMap
+><Comments
+>06062025: RAJUD: added new mapping for R2.0 NSA changes</Comments
+><DestinationFieldName
+>MSPEligibility</DestinationFieldName
+><SourceFieldExpression
+>[MSPEligibility]</SourceFieldExpression
+></EaiFieldMap
+><EaiFieldMap
+><Comments
+>Old: IIF([BaseData] IS NOT NULL, [BaseData],&quot;NA&quot;)</Comments
+><DestinationFieldName
+>BaseData</DestinationFieldName
+><SourceFieldExpression
+>IIF([BaseData] IS NOT NULL, IIF(Mid([BaseData],1,Len([BaseData])-2) &gt;= 99999,&quot;Unlimited GB&quot;,[BaseData]),&quot;NA&quot;)</SourceFieldExpression
+></EaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>BonusData</DestinationFieldName
+><SourceFieldExpression
+>IIF([BonusData] IS NOT NULL, [BonusData],&quot;NA&quot;)</SourceFieldExpression
+></EaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>DevicePayoutFee</DestinationFieldName
+><SourceFieldExpression
+>IIF([DevicePayoutFee] &lt;&gt; &quot;NA&quot;, &quot;$&quot;+[DevicePayoutFee]+&quot; Incl. GST&quot;, [DevicePayoutFee])</SourceFieldExpression
+></EaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>EarlyUpgradeFee</DestinationFieldName
+><SourceFieldExpression
+>IIF([EarlyUpgradeFee] &lt;&gt; &quot;NA&quot;, &quot;$&quot;+[EarlyUpgradeFee]+&quot; Incl. GST&quot;, [EarlyUpgradeFee])</SourceFieldExpression
+></EaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>FulfilmentRef</DestinationFieldName
+><SourceFieldExpression
+>IIF([Fullfillment Order Id] IS NOT NULL, [Fullfillment Order Id], &quot;NA&quot;)</SourceFieldExpression
+></EaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>IntZone1</DestinationFieldName
+><SourceFieldExpression
+>IIF([IntZone1] IS NOT NULL, IIF([IntZone1] = &quot;99999 Minutes&quot;,&quot;Unlimited Minutes&quot;,[IntZone1]) ,&quot;NA&quot;)</SourceFieldExpression
+></EaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>IntZone2</DestinationFieldName
+><SourceFieldExpression
+>IIF([IntZone2] IS NOT NULL, IIF([IntZone2] = &quot;99999 Minutes&quot;,&quot;Unlimited Minutes&quot;,[IntZone2]) ,&quot;NA&quot;)</SourceFieldExpression
+></EaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>NPEYFee</DestinationFieldName
+><SourceFieldExpression
+>IIF([NPEYFee] &lt;&gt; &quot;NA&quot;, &quot;$&quot;+[NPEYFee]+&quot; Incl. GST&quot;, [NPEYFee])</SourceFieldExpression
+></EaiFieldMap
+><EaiFieldMap
+><Comments
+>MADHUR::09-MAY-23::Added to add PlanValue for XS-NSA</Comments
+><DestinationFieldName
+>PlanVal</DestinationFieldName
+><SourceFieldExpression
+>[PlanVal]</SourceFieldExpression
+></EaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>Deferred Service</DestinationFieldName
+><SourceFieldExpression
+>[Deferred Service]</SourceFieldExpression
+></EaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>OrderRef</DestinationFieldName
+><SourceFieldExpression
+>IIF([External Ref Id] IS NOT NULL, [External Ref Id], [Order Num])</SourceFieldExpression
+></EaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>Plan</DestinationFieldName
+><SourceFieldExpression
+>[Plan]</SourceFieldExpression
+></EaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>PlanTerm</DestinationFieldName
+><SourceFieldExpression
+>[PlanTerm]</SourceFieldExpression
+></EaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>ServiceOrderID</DestinationFieldName
+><SourceFieldExpression
+>[Root Order Item Id]</SourceFieldExpression
+></EaiFieldMap
+><EaiFieldMap
+><Comments
+>Old: IIF([SharingIndicator] IS NOT NULL, IIF([TotalData] IS NOT NULL, [TotalData],&quot;NA&quot;), &quot;NA&quot;)</Comments
+><DestinationFieldName
+>SharedData</DestinationFieldName
+><SourceFieldExpression
+>IIF([SharingIndicator] IS NOT NULL, IIF([TotalData] IS NOT NULL, IIF(Mid([TotalData],1,Len([TotalData])-2) &gt;= 99999,&quot;Unlimited GB&quot;,[TotalData]),&quot;NA&quot;), &quot;NA&quot;)</SourceFieldExpression
+></EaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>SIM</DestinationFieldName
+><SourceFieldExpression
+>[SIM]</SourceFieldExpression
+></EaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>TotalMonthlyCost</DestinationFieldName
+><SourceFieldExpression
+>IIF(LookupValue(&quot;VHA_NSA_DISP_TOTAL&quot;,&quot;Display Total&quot;)=&quot;Y&quot;,&quot;$&quot;+[TotalMonthlyCost]+&quot;/Month&quot;,&quot;&quot;)</SourceFieldExpression
+></EaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>Shared</DestinationFieldName
+><SourceFieldExpression
+>IIF([Shared] = &quot;Y&quot;, &quot;Yes&quot;,&quot;No&quot;)</SourceFieldExpression
+></EaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>Id</DestinationFieldName
+><SourceFieldExpression
+>[Id]</SourceFieldExpression
+></EaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>MSISDN</DestinationFieldName
+><SourceFieldExpression
+>IIF ([New MSISDN] IS NOT NULL ,[New MSISDN],[MSISDN])</SourceFieldExpression
+></EaiFieldMap
+></ListOfEaiFieldMap
+></EaiComponentMap
+><EaiComponentMap
+><Comments
+></Comments
+><DestinationComponentName
+>SecondaryDevice</DestinationComponentName
+><DestinationValidation
+></DestinationValidation
+><Name
+>2_6</Name
+><ParentComponentMapName
+>Service</ParentComponentMapName
+><SourceComponentName
+>VHA Contract Doc Accessory</SourceComponentName
+><SourceSearchSpecification
+>[Type] = &apos;Accessory&apos; AND [Category] = &apos;Secondary Device&apos;</SourceSearchSpecification
+><SourceValidation
+></SourceValidation
+><ListOfEaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>Name</DestinationFieldName
+><SourceFieldExpression
+>IIF([Out of Stock Indicator Flag] = &quot;Y&quot;,[Accessory Name]+&quot;*&quot;,[Accessory Name])</SourceFieldExpression
+></EaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>MonthlyRepayment</DestinationFieldName
+><SourceFieldExpression
+>IIF([Price Calc] = &quot;&quot; OR [Price Calc] = &quot;0&quot;, &quot;0.00&quot;, IIF(Instr(([Price Calc] - IIF([Prepayment Amount] = &quot;&quot;, 0, [Prepayment Amount])) / 36, &quot;.&quot;) &gt; 0, Left(([Price Calc] - IIF([Prepayment Amount] = &quot;&quot;, 0, [Prepayment Amount])) / 36, Instr(([Price Calc] - IIF([Prepayment Amount] = &quot;&quot;, 0, [Prepayment Amount])) / 36, &quot;.&quot;) + 2), ([Price Calc] - IIF([Prepayment Amount] = &quot;&quot;, 0, [Prepayment Amount])) / 36))</SourceFieldExpression
+></EaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>Insurance</DestinationFieldName
+><SourceFieldExpression
+>[SD Insurance]</SourceFieldExpression
+></EaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>Price</DestinationFieldName
+><SourceFieldExpression
+>IIF([Price Calc] IS NOT NULL, &quot;$&quot;+[Price Calc]+&quot; Incl. GST&quot;,&quot;&quot;)</SourceFieldExpression
+></EaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>IMEI</DestinationFieldName
+><SourceFieldExpression
+>[IMEI]</SourceFieldExpression
+></EaiFieldMap
+><EaiFieldMap
+><Comments
+></Comments
+><DestinationFieldName
+>Term</DestinationFieldName
+><SourceFieldExpression
+>IIF([APP Monthly Repayment Calc] = &quot;0.00&quot;,&quot;-&quot;,IIF([Term Num] = 1, &quot;1 Month&quot;, IIF([Term Num] &gt; 1,IIf ([Term Override] &lt;&gt; &quot;_&quot;,[Term Override],[Term])+&quot; Months&quot;,[Term Num])))</SourceFieldExpression
+></EaiFieldMap
+></ListOfEaiFieldMap
+></EaiComponentMap
+></ListOfEaiComponentMap
+><ListOfEaiMapArgument
+><EaiMapArgument
+><Comments
+></Comments
+><DataType
+>DTYPE_TEXT</DataType
+><DisplayName
+>Flow</DisplayName
+><Name
+>Flow</Name
+></EaiMapArgument
+><EaiMapArgument
+><Comments
+></Comments
+><DataType
+>DTYPE_TEXT</DataType
+><DisplayName
+>ShipAddress</DisplayName
+><Name
+>ShipAddress</Name
+></EaiMapArgument
+></ListOfEaiMapArgument
+></EaiObjectMap
+></ListOfEaiDataMap
+></SiebelMessage
+>

@@ -1,0 +1,2315 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<REPOSITORY
+   NAME="Siebel Repository"
+   UPDATED="02/11/2019 19:21:26"
+   UPDATED_BY="SADMIN"
+   CREATED="02/11/2019 18:54:57"
+   CREATED_BY="SADMIN"
+   FIO_PLACEHOLDER_FIO="TRUE">
+	<PROJECT
+	   ALLOW_OBJECT_LOCKING="Y"
+	   COMMENTS="MURALIDHARANK 12/05/2014: Created for Postpay TBUI"
+	   INACTIVE="N"
+	   LANGUAGE_LOCKED="ENU"
+	   LOCKED="Y"
+	   LOCKED_DATE="05/10/2019 19:43:35"
+	   NAME="VF Post Connect TBUI"
+	   UI_FREEZE="N"
+	   LOCKED_BY_NAME="SADMIN"
+	   UPDATED="05/10/2019 19:43:36"
+	   UPDATED_BY="SADMIN"
+	   CREATED="05/12/2014 15:40:24"
+	   CREATED_BY="SADMIN"
+	   FIO_PLACEHOLDER_FIO="TRUE">
+		<APPLET
+		   BUSINESS_COMPONENT="Order Entry Attachment SSJ"
+		   CLASS="CSSFrameListFile"
+		   COMMENTS="VF - Neel 02/06/2014 - New for Generate Contract"
+		   DISABLE_DATALOSS_WARNING="N"
+		   HTML_NUMBER_OF_ROWS="5"
+		   HEIGHT="3"
+		   INACTIVE="N"
+		   NAME="VF Order Entry Attachment List Applet TBUI SSJ"
+		   NO_DELETE="N"
+		   NO_INSERT="N"
+		   NO_MERGE="Y"
+		   NO_UPDATE="Y"
+		   SCRIPTED="Y"
+		   SEARCH_SPECIFICATION="IIf([OrderFileSrcPath] = &quot;Contract&quot; AND LookupValue (&apos;VF_PDF_GENERATION&apos;, &apos;Enable&apos;) = &quot;Y&quot;, IIf((GetProfileAttr(&quot;IsOpenUI&quot;) &gt; 0), [OrderFileExt] = &quot;pdf&quot;, [OrderFileExt] = &quot;xfdf&quot;), [Order Id] IS NOT NULL)"
+		   TYPE="Standard"
+		   UPGRADE_BEHAVIOR="Preserve"
+		   WIDTH="2"
+		   UPDATED="04/23/2026 21:49:27"
+		   UPDATED_BY="SWATANTRAS"
+		   CREATED="01/09/2026 15:49:21"
+		   CREATED_BY="SADMIN">
+			<APPLET_LOCALE
+			   APPLICATION_CODE="STD"
+			   INACTIVE="N"
+			   LANGUAGE_CODE="ENU"
+			   NAME="ENU-STD"
+			   REDO="N"
+			   TITLE="Generate contract"
+			   TRANSLATE="Y"
+			   UPDATED="03/06/2026 18:54:03"
+			   UPDATED_BY="SAIB"
+			   CREATED="01/09/2026 15:56:01"
+			   CREATED_BY="SADMIN">
+			</APPLET_LOCALE>
+			<APPLET_METHOD_MENU_ITEM
+			   COMMAND="Delete Record (SWE)"
+			   COMMENTS="VF 23/10/2006 CY: Defect #20220."
+			   INACTIVE="N"
+			   NAME="6"
+			   POSITION="6"
+			   SUPPRESS_MENU_ITEM="Y"
+			   UPDATED="01/09/2026 15:56:05"
+			   UPDATED_BY="SADMIN"
+			   CREATED="01/09/2026 15:56:05"
+			   CREATED_BY="SADMIN">
+				<APPLET_METHOD_MENU_ITEM_LOCALE
+				   APPLICATION_CODE="STD"
+				   INACTIVE="N"
+				   LANGUAGE_CODE="ENU"
+				   MENU_TEXT="Delete Record"
+				   NAME="ENU-STD"
+				   TRANSLATE="Y"
+				   UPDATED="01/09/2026 15:56:08"
+				   UPDATED_BY="SADMIN"
+				   CREATED="01/09/2026 15:56:08"
+				   CREATED_BY="SADMIN">
+				</APPLET_METHOD_MENU_ITEM_LOCALE>
+			</APPLET_METHOD_MENU_ITEM>
+			<APPLET_SERVER_SCRIPT
+			   INACTIVE="N"
+			   NAME="ReuseFlgValue"
+			   PROGRAM_LANGUAGE="JS"
+			   SCRIPT="function ReuseFlgValue(ReuseOrderLine)
+{
+	try
+	{
+		var sReuseOrder = &quot;&quot;;
+		var sReuseFlg = &quot;&quot;;
+		var sFBBOnly = TheApplication().InvokeMethod(&quot;LookupValue&quot;,&quot;VHA_FBB_PROPOSITION_TYPE&quot;,&quot;FBB Only&quot;)
+		var sFBBWithMBB = TheApplication().InvokeMethod(&quot;LookupValue&quot;,&quot;VHA_FBB_PROPOSITION_TYPE&quot;,&quot;FBB with MBB&quot;)
+		var bcParent=this.BusComp().ParentBusComp();
+		if(bcParent!=&quot;&quot;)
+		{
+			if(bcParent.Name()==&quot;Order Entry - Orders&quot;)
+			{
+				bcParent.ActivateField(&quot;Id&quot;);
+				sReuseOrder = bcParent.GetFieldValue(&quot;Id&quot;);
+			}
+		}
+			var sBO = TheApplication().GetBusObject(&quot;Order Item&quot;);
+			var sBC = sBO.GetBusComp(&quot;Order Entry - Line Items (Simple)&quot;);
+			var psErrorInput, psErrorOutput, sErrorMessage, bsError;
+			var sSearchspec = &quot;[Order Header Id] = &apos;&quot; + sReuseOrder + &quot;&apos; AND [Root Order Item Id] = [Id] AND [Action Code] &lt;&gt; &apos;Delete&apos; AND ([VF Siebel Product Type] = &apos;&quot; + sFBBOnly + &quot;&apos; OR [VF Siebel Product Type] = &apos;&quot; + sFBBWithMBB + &quot;&apos;)&quot;;
+			with (sBC)
+			{
+						SetViewMode(AllView);
+						ClearToQuery();
+						ActivateField(&quot;Order Header Id&quot;);
+						ActivateField(&quot;Root Order Item Id&quot;);
+						ActivateField(&quot;VF Reuse Modem Flg&quot;);
+						ActivateField(&quot;VF Siebel Product Type&quot;);
+						ActivateField(&quot;Id&quot;);
+						SetSearchExpr(sSearchspec);
+						ExecuteQuery(ForwardOnly);
+						if(FirstRecord())
+						{
+							sReuseFlg = GetFieldValue(&quot;VF Reuse Modem Flg&quot;);
+						}	
+			}
+			return sReuseFlg;
+	}
+	catch (e) 
+	{	
+		if(!defined(e.errText))
+		{
+	        sErrorMessage = e.toString();
+	    }
+	    else
+	    {
+	    	sErrorMessage = e.errText;
+	    }
+	    
+		psErrorInput  = TheApplication().NewPropertySet();
+		psErrorOutput = TheApplication().NewPropertySet();
+		bsError = TheApplication().GetService(&quot;VF Error Handling Service&quot;);
+		psErrorInput.SetProperty(&quot;SourceName&quot;,&quot;PreInvoke&quot;);
+		psErrorInput.SetProperty(&quot;FunctionName&quot;,&quot;ReuseFlgValue&quot;);
+		psErrorInput.SetProperty(&quot;Error Msg&quot;, sErrorMessage); 
+		bsError.InvokeMethod(&quot;HandleException&quot;,psErrorInput,psErrorOutput);
+		sErrorMessage = psErrorOutput.GetProperty(&quot;ErrorMessage&quot;);
+	}
+	finally
+	{
+		
+		sBC = null;
+		sBO = null;
+		psErrorInput = null;
+		psErrorOutput = null;
+	}
+}"
+			   SEQUENCE="3"
+			   UPDATED="01/09/2026 16:01:52"
+			   UPDATED_BY="SADMIN"
+			   CREATED="01/09/2026 16:01:52"
+			   CREATED_BY="SADMIN">
+			</APPLET_SERVER_SCRIPT>
+			<APPLET_SERVER_SCRIPT
+			   INACTIVE="N"
+			   NAME="WebApplet_InvokeMethod"
+			   PROGRAM_LANGUAGE="JS"
+			   SCRIPT="/*
+ * Component Name        : 	VF Upgrade Wizard - Order Entry Attachment Form Applet
+ * Method Name           : 	InvokeMethod
+ * Component Information : 	Event Handler
+ *
+ * Modification History  :
+ * Date			Author		Config #	Description
+ * ============ ===========	===========	================================
+ * 11/05/2011	EW						Initial Version
+ * 09/09/2011	EW						Updated for 11.D
+ */
+function WebApplet_InvokeMethod (MethodName)
+{
+	var boCurrent;
+	var bcWizardSession;
+
+	try
+	{
+		switch (MethodName)
+		{			
+			case &quot;GenerateContract&quot;:
+			
+				with (this.BusComp())
+				{				
+					// Refresh the business component
+					ClearToQuery();
+					SetSortSpec(&quot;Created (DESC)&quot;);
+					ExecuteQuery();
+													
+					TheApplication().SetProfileAttr(&quot;EnableWizardSubmitOrderButton&quot;,&quot;Y&quot;);
+				}
+				
+				// If on the wizard business component
+				boCurrent = this.BusObject();
+				if (boCurrent.Name() == &quot;VF Wizard&quot;)
+				{
+					bcWizardSession = boCurrent.GetBusComp(&quot;VF Wizard Session&quot;);
+					
+					// Set the flag to prevent users from going back in the wizard after contract
+					// generation
+					bcWizardSession.SetFieldValue(&quot;Can Navigate Back&quot;, &quot;N&quot;);
+					bcWizardSession.WriteRecord();
+				}
+				break;
+		}
+	}
+	catch (e)
+	{
+		throw e;
+	}
+	finally
+	{
+		bcWizardSession = null;
+		boCurrent = null;
+	}
+}"
+			   SEQUENCE="4"
+			   UPDATED="01/09/2026 16:01:52"
+			   UPDATED_BY="SADMIN"
+			   CREATED="01/09/2026 16:01:52"
+			   CREATED_BY="SADMIN">
+			</APPLET_SERVER_SCRIPT>
+			<APPLET_SERVER_SCRIPT
+			   INACTIVE="N"
+			   NAME="WebApplet_PreCanInvokeMethod"
+			   PROGRAM_LANGUAGE="JS"
+			   SCRIPT="/*
+ * Component Name        : 	VF Upgrade Wizard - Order Entry Attachment Form Applet
+ * Method Name           : 	PreCanInvokeMethod
+ * Component Information : 	Event Handler
+ *
+ * Modification History  :
+ * Date			Author		Config #	Description
+ * ============ ===========	===========	================================
+ * 11/05/2011	EW						Initial Version
+ */
+function WebApplet_PreCanInvokeMethod (MethodName, &amp;CanInvoke)
+{
+	try
+	{
+		switch (MethodName)
+		{
+			case &quot;GenerateLetter&quot;:
+				CanInvoke = &quot;TRUE&quot;;
+				return (CancelOperation);	
+				break;	
+			
+			
+			// HR: 14/07/2011 Added Code for Merlin			
+			case &quot;GenerateContract&quot;:
+			
+			//KS: 3/20/2026 :SSJ Fullfillment
+			var sProdAcc = &quot;N&quot;,lineRec = &quot;&quot;;
+			var strReuseFlg = &quot;&quot;;//03/02/2025 Sakthi Added for reuse modem defect 2521
+			var sOrderFunction = TheApplication().GetProfileAttr(&quot;sCOrderFunction&quot;);
+			var sOrderSubType = TheApplication().GetProfileAttr(&quot;sCOrderSubType&quot;);
+			var quoteId = TheApplication().GetProfileAttr(&quot;QuoteId&quot;);
+			var bcOrderItem = TheApplication().GetBusObject(&quot;VHA SSJ Generic No Link BO&quot;).GetBusComp(&quot;Order Entry - Line Items (Simple)&quot;);
+            with (bcOrderItem) 
+			{
+                SetViewMode(AllView);
+                ClearToQuery();
+                ActivateField(&quot;Product Type&quot;);
+                ActivateField(&quot;Order Quote Id&quot;);
+				ActivateField(&quot;Action Code&quot;);
+				//ActivateField(&quot;Id&quot;);
+				//var AccId = GetFieldValue(&quot;Id&quot;);
+				//var product = GetFieldValue(&quot;Product&quot;);
+				//var Actioncd = GetFieldValue(&quot;Action Code&quot;);
+                SetSearchExpr(&quot;[Order Quote Id] = &apos;&quot; + quoteId + &quot;&apos; AND [Action Code] = &apos;Add&apos; AND ([Product Type] = &apos;Accessory&apos; OR [Product Type] = &apos;Billing - APP&apos;)&quot;);//MANOHARG:01062026:Modified code as per defect - CM-11725			
+                ExecuteQuery(ForwardOnly);
+                lineRec = FirstRecord();
+                if(lineRec)  
+				{
+					sProdAcc =&quot;Y&quot;;
+				}
+				
+			}
+			//Roseline:16/06/2017 - Added below condition to disable the contract button for the maange service flow
+			if((sOrderSubType == &quot;Connect&quot;) || (TheApplication().GetProfileAttr(&quot;ActiveViewName&quot;)== &quot;VHA Manage Services Order Summary View&quot;) || (TheApplication().GetProfileAttr(&quot;ActiveViewName&quot;)== &quot;VF New Connect MSO Order Summary View TBUI SSJ - eSIM Details&quot; &amp;&amp; sOrderFunction == &quot;&quot; &amp;&amp; sProdAcc ==&quot;Y&quot; &amp;&amp; (sOrderSubType == &quot;Change Proposition&quot; || sOrderSubType == &quot;Modify&quot;))) //OR condition added MM:CM-9365
+			{		
+				CanInvoke = &quot;TRUE&quot;;
+				TheApplication().SetProfileAttr(&quot;GenerateContractMsg&quot;,&quot;Y&quot;);
+				return (CancelOperation);		
+			}
+			
+			//if(mCreditCheckStatus()&amp;&amp; mPendingConAssDFO())//R12.3,DFFO,VIJAYE,Added the condition mPendingConAssDFO for TD 11416
+			if(mCreditCheckStatus() &amp;&amp; mPendingConAssDFO())
+			{
+				strReuseFlg = ReuseFlgValue();
+				if(strReuseFlg == &quot;Y&quot;)//03/02/2025 Sakthi Added for reuse modem defect 2521	
+				{
+					CanInvoke = &quot;FALSE&quot;;
+					TheApplication().SetProfileAttr(&quot;GenerateContractMsg&quot;,&quot;N&quot;);
+					return (CancelOperation);
+				}
+				else
+				{
+					if(TheApplication().GetProfileAttr(&quot;ActiveViewName&quot;) == &quot;VF New Connect MSO Order Summary View TBUI SSJ - eSIM Details&quot; &amp;&amp; sOrderFunction == &quot;&quot; &amp;&amp; (sOrderSubType == &quot;Change Proposition&quot; || sOrderSubType == &quot;Modify&quot;) &amp;&amp; sProdAcc ==&quot;N&quot;)
+					{
+					CanInvoke = &quot;FALSE&quot;;
+					TheApplication().SetProfileAttr(&quot;GenerateContractMsg&quot;,&quot;N&quot;);
+					return (CancelOperation);
+					}
+					else
+					{				
+					CanInvoke = &quot;TRUE&quot;;
+					TheApplication().SetProfileAttr(&quot;GenerateContractMsg&quot;,&quot;Y&quot;);
+					return (CancelOperation);
+					}
+				}		
+			}
+			else
+			{
+				CanInvoke = &quot;FALSE&quot;;
+				TheApplication().SetProfileAttr(&quot;GenerateContractMsg&quot;,&quot;N&quot;);
+				return (CancelOperation);
+			}
+			break;		
+				
+			//27/05/2015 Tabrez June BFX PKE000000020703  /PKE000000018063			
+			case &quot;DeleteRecord&quot;:
+			
+			this.BusComp().ActivateField(&quot;VF Order Status&quot;);
+			var strStatus = this.BusComp().GetFieldValue(&quot;VF Order Status&quot;);
+			
+			if(strStatus == &quot;Submitted&quot;)
+			{
+				CanInvoke = &quot;FALSE&quot;;
+				return (CancelOperation);
+			}
+			else
+			{
+				CanInvoke = &quot;TRUE&quot;;
+				return (CancelOperation);
+			}
+			break;
+				
+			case &quot;SendEmail&quot;: //JS 24042020 added for NSA Email
+			var sFileName = this.BusComp().GetFieldValue(&quot;VF Line Item Id&quot;);
+			var sUserTypeCheck = TheApplication().InvokeMethod(&quot;LookupValue&quot;, &quot;VF_CR_ENABLE_FLAG&quot;, &quot;NSASendEmail&quot; + TheApplication().GetProfileAttr(&quot;VHA User Type&quot;));
+			if (sFileName.indexOf(&quot;TNC.pdf&quot;) &gt;= 1 &amp;&amp; sUserTypeCheck == &quot;Y&quot;)
+			{
+				CanInvoke = &quot;TRUE&quot;;
+				return (CancelOperation);
+			}
+			else
+			{
+				CanInvoke = &quot;FALSE&quot;;
+				return (CancelOperation);
+			}
+			break;		
+
+			default:
+				return (ContinueOperation);			
+		}
+	}
+	catch (e)
+	{
+		throw e;
+	}
+	finally
+	{
+		bcOrderItem = null;
+	}
+}"
+			   SEQUENCE="5"
+			   UPDATED="06/12/2026 16:11:46"
+			   UPDATED_BY="KRISHNAS"
+			   CREATED="01/09/2026 16:01:52"
+			   CREATED_BY="SADMIN">
+			</APPLET_SERVER_SCRIPT>
+			<APPLET_SERVER_SCRIPT
+			   INACTIVE="N"
+			   NAME="WebApplet_PreInvokeMethod"
+			   PROGRAM_LANGUAGE="JS"
+			   SCRIPT="/*
+ * Component Name        : 	VF Upgrade Wizard - Order Entry Attachment Form Applet
+ * Method Name           : 	PreInvokeMethod
+ * Component Information : 	Event Handler
+ *
+ * Modification History  :
+ * Date			Author		Config #	Description
+ * ============ ===========	===========	================================
+ * 11/05/2011	EW						Initial Version
+ */
+function WebApplet_PreInvokeMethod (MethodName)
+{
+	try
+	{
+		switch (MethodName)
+		{			
+			case &quot;Drilldown&quot;:
+			
+				with (this.BusComp())
+				{				
+					// Refresh the business component
+					
+					//Subramanian 17SEP2014: Commented as only the first record is getting saved.
+					/*ClearToQuery();
+					ActivateField(&quot;OrderComments&quot;);
+					SetSortSpec(&quot;Created (DESC)&quot;);
+					ExecuteQuery();
+					*/
+				
+					/*if (FirstRecord())
+					{*/
+						// Update the comments to indicate that the user has opened
+						if (GetFieldValue(&quot;OrderComments&quot;) == &quot;&quot;)
+						{
+							SetFieldValue(&quot;OrderComments&quot;, TheApplication().LoginName() + &quot; - Attachment opened&quot;);
+							WriteRecord();
+						}
+					//}
+				}
+				break;
+			case &quot;DeleteRecord&quot;:
+				var sView = TheApplication().ActiveViewName();
+				if(sView == &quot;VF New Connect MSO Order Summary View TBUI Prepayment&quot; || sView == &quot;VF New Connect MSO Order Summary View TBUI&quot; || sView == &quot;VF New Connect MSO Order Summary View TBUI - eSIM Details&quot;)
+				{
+					with(this.BusComp())
+					{
+						var IsRec = FirstRecord();
+						while(IsRec)
+						{
+							DeleteRecord();
+							IsRec = FirstRecord();
+						}
+					}
+				return CancelOperation;
+				}
+			break;
+		}
+	}
+	catch (e)
+	{
+		throw e;
+	}
+	finally
+	{
+
+	}
+}"
+			   SEQUENCE="6"
+			   UPDATED="01/09/2026 16:01:52"
+			   UPDATED_BY="SADMIN"
+			   CREATED="01/09/2026 16:01:52"
+			   CREATED_BY="SADMIN">
+			</APPLET_SERVER_SCRIPT>
+			<APPLET_SERVER_SCRIPT
+			   INACTIVE="N"
+			   NAME="WebApplet_ShowControl"
+			   PROGRAM_LANGUAGE="JS"
+			   SCRIPT="// HR: 14/07/2011 Added Code for Merlin	
+function WebApplet_ShowControl (ControlName, Property, Mode, &amp;HTML)
+{
+
+try
+   {
+      switch (ControlName)
+      {
+         case &quot;HTML Label&quot;:
+          if (TheApplication().GetProfileAttr(&quot;GenerateContractMsg&quot;) == &quot;Y&quot;)
+            {      
+               HTML = &quot;&quot;;	 
+            }
+                   
+         break;            
+      }
+   }
+   catch(e)
+   {
+     throw (e);
+   }
+   finally
+	{
+		//Do Nothing
+	}
+
+}"
+			   SEQUENCE="7"
+			   UPDATED="01/09/2026 16:01:52"
+			   UPDATED_BY="SADMIN"
+			   CREATED="01/09/2026 16:01:52"
+			   CREATED_BY="SADMIN">
+			</APPLET_SERVER_SCRIPT>
+			<APPLET_SERVER_SCRIPT
+			   INACTIVE="N"
+			   NAME="mCreditCheckStatus"
+			   PROGRAM_LANGUAGE="JS"
+			   SCRIPT="/*
+ * Component Name			: VF Connect Wizard - Order Entry Attachment Form Applet
+ * Method Name           	: mCreditCheckStatus
+ * Component Information 	: Logic to check credit check status
+ *
+ * Modification History  :
+ * Date			Author		Config #	Description
+ * ============ ===========	===========	================================
+ * 4/07/2011 	HR						Added for Project Merlin
+ * 18/08/2011	EW						Fixed Acceptance 7372
+ */
+
+function mCreditCheckStatus()
+{	
+
+	try
+	{
+		var boWizard = TheApplication().ActiveBusObject();
+		var bcComFinProfile= boWizard.GetBusComp(&quot;VF Com Financial Profile&quot;);
+		TheApplication().SetProfileAttr(&quot;AppConLiveConValidation&quot;,&quot;false&quot;);	
+		with (bcComFinProfile)
+		{
+			var dtCCExpiryDate = new Date(GetFieldValue(&quot;VF Credit Check Expiry Date&quot;));
+			var strCCExpiryDateToSys = 	dtCCExpiryDate.toSystem(); 
+			var strCredtCheckStatus = GetFieldValue(&quot;VF Credit Check Status&quot;);
+			var bConditionsAcceptedFlag = GetFieldValue(&quot;VF Conditional Approval Accepted&quot;);
+			var strCurrentSysDate = Clib.time();
+			var strCondAccepted = GetFieldValue(&quot;VF Conditional Approval Accepted&quot;);
+			var LiveConnections = ToNumber(GetFieldValue(&quot;VF Live Connections&quot;));
+			var ApprovedConnections = ToNumber(GetFieldValue(&quot;VF Approved Connections&quot;));
+		//	var HandsetQty = ToNumber(GetFieldValue(&quot;VF Intended Handset Quantity&quot;)); // commented as this field is inactive at bc level-TBUI
+			var strOverrideCode = GetFieldValue(&quot;VF Override Code&quot;);
+							
+			if (strCredtCheckStatus == &quot;APPROVE&quot; || strCredtCheckStatus == &quot;APPROVED&quot; || (strCredtCheckStatus == &quot;CONDAPPRVE&quot; &amp;&amp; strOverrideCode == &quot;APPROVE&quot;))
+			{
+				if (ApprovedConnections &lt;= LiveConnections)	//R12.3,TD 9784,VIJAYE,Included the validation while enable or disable the Generate Contract button
+					TheApplication().SetProfileAttr(&quot;AppConLiveConValidation&quot;,&quot;true&quot;);							
+			return true;
+			}
+			if (strCredtCheckStatus == &quot;REFER&quot; || strCredtCheckStatus == &quot;REFERRED&quot; || strCredtCheckStatus == &quot;Pending&quot; || (strCredtCheckStatus == &quot;CONDAPPRVE&quot; &amp;&amp; strOverrideCode != &quot;APPROVE&quot;)
+			|| strCredtCheckStatus == &quot;WITHDRAW&quot; || strCredtCheckStatus == &quot;Failed&quot; || strCredtCheckStatus == &quot;DECLINE&quot; || strCredtCheckStatus == &quot;DECLINED&quot;)
+			{
+			return false;
+			}
+			
+			if (ApprovedConnections &lt;= LiveConnections)
+			{
+			return false;
+			}
+			
+ 		}
+	}
+	catch (e)
+	{
+		throw (e);
+	}
+	finally
+	{
+		bcComFinProfile = null;
+		boWizard = null;  /* This variable is nullified by Sharukh on 22/03/2019*/
+
+	}
+}"
+			   SEQUENCE="1"
+			   UPDATED="01/09/2026 16:01:53"
+			   UPDATED_BY="SADMIN"
+			   CREATED="01/09/2026 16:01:53"
+			   CREATED_BY="SADMIN">
+			</APPLET_SERVER_SCRIPT>
+			<APPLET_SERVER_SCRIPT
+			   INACTIVE="N"
+			   NAME="mPendingConAssDFO"
+			   PROGRAM_LANGUAGE="JS"
+			   SCRIPT="/*
+ * Component Name			: VF Connect Wizard - Order Entry Attachment Form Applet
+ * Method Name           	: mPendingConAssDFO
+ * Component Information 	: Added logic to look, Is there any pending connections associated to completed fulfilment order,if so return &apos;false&apos;.
+ *
+ * Modification History  :
+ * Date			Author		Config #	Description
+ * ============ ===========	===========	================================
+ * 12/04/2012 	VIJAYE					R12.3	Added for DFFO
+ 
+ */
+
+function mPendingConAssDFO()
+{	
+
+	try
+	{
+		var strConnValidation;
+		var bcParent=this.BusComp().ParentBusComp();
+		var sCAId,bsCAPendingConCount,psInputs,psOutputs,sConCount=0,strWarningMsg,sLiveCon,sApprCon;
+			if(bcParent!=&quot;&quot;)
+			{
+				if(bcParent.Name()==&quot;Order Entry - Orders&quot;)
+				{
+					bcParent.ActivateField(&quot;Account Id&quot;);
+					sCAId=bcParent.GetFieldValue(&quot;Account Id&quot;);
+					bsCAPendingConCount = TheApplication().GetService(&quot;VF CA Pending Connect Count&quot;);
+					psInputs = TheApplication().NewPropertySet();
+					psOutputs = TheApplication().NewPropertySet();
+					psInputs.SetProperty(&quot;CA Id&quot;,sCAId);
+					bsCAPendingConCount.InvokeMethod(&quot;CountPendingDFConnections&quot;, psInputs, psOutputs);
+					sConCount=psOutputs.GetProperty(&quot;PendingDFConections&quot;);
+				}
+			}
+				strConnValidation = TheApplication().GetProfileAttr(&quot;AppConLiveConValidation&quot;);//R12.3,TD 9782,VIJAYE,Included the validation while enable or disable the Generate Contract button
+
+				if(strConnValidation==&quot;true&quot; &amp;&amp; sConCount&gt;0)
+					return false;
+				else
+					return true;
+				
+	}
+	catch (e)
+	{
+		throw e;
+	}
+	finally
+	{
+		bcParent = null;
+		bsCAPendingConCount = null;
+		psInputs = null;
+		psOutputs = null;
+		TheApplication().SetProfileAttr(&quot;AppConLiveConValidation&quot;,&quot;false&quot;);	
+	}
+}"
+			   SEQUENCE="2"
+			   UPDATED="01/09/2026 16:01:53"
+			   UPDATED_BY="SADMIN"
+			   CREATED="01/09/2026 16:01:53"
+			   CREATED_BY="SADMIN">
+			</APPLET_SERVER_SCRIPT>
+			<APPLET_USER_PROP
+			   INACTIVE="Y"
+			   NAME="CanInvokeMethod: NewFileAttachment"
+			   VALUE="TRUE"
+			   UPDATED="01/16/2026 22:45:55"
+			   UPDATED_BY="SHALINIK_NOT_IN"
+			   CREATED="01/16/2026 01:17:45"
+			   CREATED_BY="SHALINIK_NOT_IN">
+			</APPLET_USER_PROP>
+			<APPLET_USER_PROP
+			   INACTIVE="N"
+			   NAME="EnableStandardMethods"
+			   VALUE="Y"
+			   UPDATED="01/09/2026 15:49:29"
+			   UPDATED_BY="SADMIN"
+			   CREATED="01/09/2026 15:49:29"
+			   CREATED_BY="SADMIN">
+			</APPLET_USER_PROP>
+			<APPLET_WEB_TEMPLATE
+			   COMMENTS="EW 02/09/2011 - Updated to Edit List to fix Prod Defect 14476"
+			   INACTIVE="N"
+			   NAME="VF Wizard Form Applet 4 Column No Header"
+			   SEQUENCE="0"
+			   TYPE="Edit List"
+			   WEB_TEMPLATE="Applet List (Base/EditList)"
+			   UPDATED="01/09/2026 15:50:36"
+			   UPDATED_BY="SADMIN"
+			   CREATED="01/09/2026 15:50:36"
+			   CREATED_BY="SADMIN">
+				<APPLET_WEB_TEMPLATE_ITEM
+				   CONTROL="DeleteRecord"
+				   EXTENSION_FLAG="N"
+				   INACTIVE="N"
+				   ITEM_IDENTIFIER="133"
+				   MARKUP_LANGUAGE="HTML"
+				   NAME="DeleteRecord"
+				   TYPE="Control"
+				   UPDATED="03/19/2026 18:25:57"
+				   UPDATED_BY="RAJUD"
+				   CREATED="01/09/2026 15:51:53"
+				   CREATED_BY="SADMIN">
+				</APPLET_WEB_TEMPLATE_ITEM>
+				<APPLET_WEB_TEMPLATE_ITEM
+				   CONTROL="GenerateForm"
+				   EXTENSION_FLAG="N"
+				   INACTIVE="N"
+				   ITEM_IDENTIFIER="131"
+				   MARKUP_LANGUAGE="HTML"
+				   NAME="GenerateForm"
+				   TYPE="Control"
+				   UPDATED="01/09/2026 15:51:53"
+				   UPDATED_BY="SADMIN"
+				   CREATED="01/09/2026 15:51:53"
+				   CREATED_BY="SADMIN">
+				</APPLET_WEB_TEMPLATE_ITEM>
+				<APPLET_WEB_TEMPLATE_ITEM
+				   CONTROL="GenerateForm"
+				   EXPRESSION="Siebel Power Communications"
+				   EXTENSION_FLAG="N"
+				   INACTIVE="N"
+				   ITEM_IDENTIFIER="136"
+				   MARKUP_LANGUAGE="HTML"
+				   NAME="GenerateForm1"
+				   TYPE="Control"
+				   UPDATED="01/16/2026 01:17:47"
+				   UPDATED_BY="SHALINIK_NOT_IN"
+				   CREATED="01/16/2026 01:17:47"
+				   CREATED_BY="SHALINIK_NOT_IN">
+				</APPLET_WEB_TEMPLATE_ITEM>
+				<APPLET_WEB_TEMPLATE_ITEM
+				   CONTROL="HTML PositionOnRow"
+				   EXTENSION_FLAG="N"
+				   INACTIVE="N"
+				   ITEM_IDENTIFIER="144"
+				   MARKUP_LANGUAGE="HTML"
+				   NAME="HTML PositionOnRow"
+				   TYPE="Control"
+				   UPDATED="01/09/2026 15:51:53"
+				   UPDATED_BY="SADMIN"
+				   CREATED="01/09/2026 15:51:53"
+				   CREATED_BY="SADMIN">
+				</APPLET_WEB_TEMPLATE_ITEM>
+				<APPLET_WEB_TEMPLATE_ITEM
+				   CONTROL="Line Number"
+				   EXTENSION_FLAG="N"
+				   INACTIVE="N"
+				   ITEM_IDENTIFIER="501"
+				   MARKUP_LANGUAGE="HTML"
+				   NAME="Line Number"
+				   TYPE="List Item"
+				   UPDATED="01/09/2026 15:51:53"
+				   UPDATED_BY="SADMIN"
+				   CREATED="01/09/2026 15:51:53"
+				   CREATED_BY="SADMIN">
+				</APPLET_WEB_TEMPLATE_ITEM>
+				<APPLET_WEB_TEMPLATE_ITEM
+				   EXPRESSION="NOT Siebel Power Communications"
+				   EXTENSION_FLAG="N"
+				   INACTIVE="N"
+				   ITEM_IDENTIFIER="132"
+				   MARKUP_LANGUAGE="HTML"
+				   NAME="NOT Siebel Power Communications"
+				   TYPE="Control"
+				   UPDATED="01/16/2026 01:17:47"
+				   UPDATED_BY="SHALINIK_NOT_IN"
+				   CREATED="01/16/2026 01:17:47"
+				   CREATED_BY="SHALINIK_NOT_IN">
+				</APPLET_WEB_TEMPLATE_ITEM>
+				<APPLET_WEB_TEMPLATE_ITEM
+				   EXPRESSION="NOT Siebel Power Communications"
+				   EXTENSION_FLAG="N"
+				   INACTIVE="N"
+				   ITEM_IDENTIFIER="131"
+				   MARKUP_LANGUAGE="HTML"
+				   NAME="NOT Siebel Power Communications1"
+				   TYPE="Control"
+				   UPDATED="01/16/2026 01:17:47"
+				   UPDATED_BY="SHALINIK_NOT_IN"
+				   CREATED="01/16/2026 01:17:47"
+				   CREATED_BY="SHALINIK_NOT_IN">
+				</APPLET_WEB_TEMPLATE_ITEM>
+				<APPLET_WEB_TEMPLATE_ITEM
+				   CONTROL="OrderComments"
+				   EXTENSION_FLAG="N"
+				   INACTIVE="N"
+				   ITEM_IDENTIFIER="503"
+				   MARKUP_LANGUAGE="HTML"
+				   NAME="OrderComments"
+				   TYPE="List Item"
+				   UPDATED="01/09/2026 15:51:53"
+				   UPDATED_BY="SADMIN"
+				   CREATED="01/09/2026 15:51:53"
+				   CREATED_BY="SADMIN">
+				</APPLET_WEB_TEMPLATE_ITEM>
+				<APPLET_WEB_TEMPLATE_ITEM
+				   CONTROL="OrderFileName"
+				   EXTENSION_FLAG="N"
+				   INACTIVE="N"
+				   ITEM_IDENTIFIER="502"
+				   MARKUP_LANGUAGE="HTML"
+				   NAME="OrderFileName"
+				   TYPE="List Item"
+				   UPDATED="01/09/2026 15:51:53"
+				   UPDATED_BY="SADMIN"
+				   CREATED="01/09/2026 15:51:53"
+				   CREATED_BY="SADMIN">
+				</APPLET_WEB_TEMPLATE_ITEM>
+				<APPLET_WEB_TEMPLATE_ITEM
+				   CONTROL="SendEmail"
+				   EXTENSION_FLAG="N"
+				   INACTIVE="N"
+				   ITEM_IDENTIFIER="132"
+				   MARKUP_LANGUAGE="HTML"
+				   NAME="SendEmail"
+				   TYPE="Control"
+				   UPDATED="01/09/2026 15:51:53"
+				   UPDATED_BY="SADMIN"
+				   CREATED="01/09/2026 15:51:53"
+				   CREATED_BY="SADMIN">
+				</APPLET_WEB_TEMPLATE_ITEM>
+				<APPLET_WEB_TEMPLATE_ITEM
+				   CONTROL="SendEmail"
+				   EXPRESSION="Siebel Power Communications"
+				   EXTENSION_FLAG="N"
+				   INACTIVE="N"
+				   ITEM_IDENTIFIER="599"
+				   MARKUP_LANGUAGE="HTML"
+				   NAME="SendEmail1"
+				   TYPE="Control"
+				   UPDATED="01/16/2026 01:17:47"
+				   UPDATED_BY="SHALINIK_NOT_IN"
+				   CREATED="01/16/2026 01:17:47"
+				   CREATED_BY="SHALINIK_NOT_IN">
+				</APPLET_WEB_TEMPLATE_ITEM>
+				<APPLET_WEB_TEMPLATE_ITEM
+				   CONTROL="UploadContract"
+				   EXPRESSION="Siebel Power Communications"
+				   EXTENSION_FLAG="N"
+				   INACTIVE="Y"
+				   ITEM_IDENTIFIER="134"
+				   MARKUP_LANGUAGE="HTML"
+				   NAME="UploadContract"
+				   TYPE="Control"
+				   UPDATED="01/16/2026 22:45:56"
+				   UPDATED_BY="SHALINIK_NOT_IN"
+				   CREATED="01/16/2026 01:17:47"
+				   CREATED_BY="SHALINIK_NOT_IN">
+				</APPLET_WEB_TEMPLATE_ITEM>
+			</APPLET_WEB_TEMPLATE>
+			<CONTROL
+			   AUTOMATIC_HORIZONTAL_SCROLL="N"
+			   AUTOMATIC_VERTICAL_SCROLL="N"
+			   DEFAULT_BUTTON="N"
+			   EXTENSION_FLAG="N"
+			   GROUP="N"
+			   HTML_DEFAULT_CONTROL="N"
+			   HTML_DISPLAY_MODE="EncodeData"
+			   HTML_ONLY="N"
+			   HTML_ROW_SENSITIVE="Y"
+			   HTML_TYPE="Text"
+			   HEIGHT="20"
+			   INACTIVE="N"
+			   LEFT="2"
+			   LEFT_TEXT="N"
+			   MULTI_LINE="N"
+			   NAME="AppletTitle"
+			   OWNER_DRAW="N"
+			   POPUP_EDIT="N"
+			   PROMPT="N"
+			   READ_ONLY="N"
+			   RUNTIME="N"
+			   SEQUENCE="14"
+			   SHOW_POPUP="N"
+			   SORT="N"
+			   TAB_STOP="N"
+			   TEXT_ALIGNMENT="Left"
+			   TEXT_ALIGNMENT-LABEL="Right"
+			   TOP="2"
+			   TYPE="Label"
+			   VERTICAL_SCROLL="N"
+			   VISIBLE="Y"
+			   WANT_RETURN="N"
+			   WIDTH="96"
+			   UPDATED="01/09/2026 15:56:53"
+			   UPDATED_BY="SADMIN"
+			   CREATED="01/09/2026 15:56:53"
+			   CREATED_BY="SADMIN">
+				<CONTROL_LOCALE
+				   APPLICATION_CODE="STD"
+				   INACTIVE="N"
+				   LANGUAGE_CODE="ENU"
+				   NAME="ENU-STD"
+				   TRANSLATE="Y"
+				   VISIBLE="Y"
+				   UPDATED="01/09/2026 15:59:41"
+				   UPDATED_BY="SADMIN"
+				   CREATED="01/09/2026 15:59:41"
+				   CREATED_BY="SADMIN">
+				</CONTROL_LOCALE>
+			</CONTROL>
+			<CONTROL
+			   AUTOMATIC_HORIZONTAL_SCROLL="Y"
+			   AUTOMATIC_VERTICAL_SCROLL="N"
+			   DEFAULT_BUTTON="N"
+			   EXTENSION_FLAG="N"
+			   GROUP="N"
+			   HTML_DEFAULT_CONTROL="N"
+			   HTML_DISPLAY_MODE="EncodeData"
+			   HTML_ONLY="Y"
+			   HTML_ROW_SENSITIVE="Y"
+			   HTML_TYPE="MiniButtonQuery"
+			   HEIGHT="10"
+			   INACTIVE="N"
+			   METHOD_INVOKED="UndoQuery"
+			   MULTI_LINE="N"
+			   NAME="CancelQuery"
+			   OWNER_DRAW="N"
+			   POPUP_EDIT="N"
+			   PROMPT="N"
+			   READ_ONLY="N"
+			   RUNTIME="N"
+			   SEQUENCE="1"
+			   SHOW_POPUP="N"
+			   SORT="Y"
+			   TAB_STOP="Y"
+			   TEXT_ALIGNMENT="Left"
+			   TEXT_ALIGNMENT-LABEL="Right"
+			   TOP="0"
+			   TYPE="PushButton"
+			   VERTICAL_SCROLL="N"
+			   VISIBLE="Y"
+			   WANT_RETURN="N"
+			   WIDTH="40"
+			   UPDATED="01/09/2026 15:56:53"
+			   UPDATED_BY="SADMIN"
+			   CREATED="01/09/2026 15:56:53"
+			   CREATED_BY="SADMIN">
+				<CONTROL_LOCALE
+				   APPLICATION_CODE="STD"
+				   CAPTION="Cancel"
+				   INACTIVE="N"
+				   LANGUAGE_CODE="ENU"
+				   NAME="ENU-STD"
+				   TRANSLATE="Y"
+				   VISIBLE="Y"
+				   UPDATED="01/09/2026 15:59:41"
+				   UPDATED_BY="SADMIN"
+				   CREATED="01/09/2026 15:59:41"
+				   CREATED_BY="SADMIN">
+				</CONTROL_LOCALE>
+			</CONTROL>
+			<CONTROL
+			   AUTOMATIC_HORIZONTAL_SCROLL="Y"
+			   AUTOMATIC_VERTICAL_SCROLL="N"
+			   COMMENTS="MM:300426:Enable button, CM-10888"
+			   DEFAULT_BUTTON="N"
+			   EXTENSION_FLAG="N"
+			   GROUP="N"
+			   HTML_DEFAULT_CONTROL="N"
+			   HTML_DISPLAY_MODE="EncodeData"
+			   HTML_ONLY="Y"
+			   HTML_ROW_SENSITIVE="Y"
+			   HTML_TYPE="MiniButton"
+			   HEIGHT="24"
+			   INACTIVE="N"
+			   METHOD_INVOKED="DeleteRecord"
+			   MULTI_LINE="N"
+			   NAME="DeleteRecord"
+			   OWNER_DRAW="N"
+			   POPUP_EDIT="N"
+			   PROMPT="N"
+			   READ_ONLY="N"
+			   RUNTIME="N"
+			   SHOW_POPUP="N"
+			   SORT="Y"
+			   TAB_STOP="Y"
+			   TEXT_ALIGNMENT="Left"
+			   TEXT_ALIGNMENT-LABEL="Right"
+			   TOP="0"
+			   TYPE="TextBox"
+			   VERTICAL_SCROLL="N"
+			   VISIBLE="Y"
+			   WANT_RETURN="N"
+			   WIDTH="120"
+			   UPDATED="04/30/2026 20:58:39"
+			   UPDATED_BY="MURUGANM"
+			   CREATED="02/19/2026 20:13:38"
+			   CREATED_BY="RAJUD">
+				<CONTROL_LOCALE
+				   APPLICATION_CODE="STD"
+				   CAPTION="Delete Contract"
+				   INACTIVE="N"
+				   LANGUAGE_CODE="ENU"
+				   NAME="ENU-STD"
+				   TRANSLATE="Y"
+				   VISIBLE="Y"
+				   UPDATED="04/30/2026 20:58:39"
+				   UPDATED_BY="MURUGANM"
+				   CREATED="02/19/2026 20:13:38"
+				   CREATED_BY="RAJUD">
+				</CONTROL_LOCALE>
+			</CONTROL>
+			<CONTROL
+			   AUTOMATIC_HORIZONTAL_SCROLL="Y"
+			   AUTOMATIC_VERTICAL_SCROLL="N"
+			   DEFAULT_BUTTON="N"
+			   EXTENSION_FLAG="N"
+			   GROUP="N"
+			   HTML_DEFAULT_CONTROL="N"
+			   HTML_DISPLAY_MODE="EncodeData"
+			   HTML_ONLY="Y"
+			   HTML_ROW_SENSITIVE="N"
+			   HTML_TYPE="MiniButtonEdit"
+			   HEIGHT="10"
+			   INACTIVE="N"
+			   LEFT="0"
+			   METHOD_INVOKED="EditRecord"
+			   MULTI_LINE="N"
+			   NAME="EditRecord"
+			   OWNER_DRAW="N"
+			   POPUP_EDIT="N"
+			   PROMPT="N"
+			   READ_ONLY="N"
+			   RUNTIME="N"
+			   SEQUENCE="16"
+			   SHOW_POPUP="N"
+			   SORT="Y"
+			   TAB_STOP="Y"
+			   TEXT_ALIGNMENT="Left"
+			   TEXT_ALIGNMENT-LABEL="Right"
+			   TOP="0"
+			   TYPE="PushButton"
+			   VERTICAL_SCROLL="N"
+			   VISIBLE="Y"
+			   WANT_RETURN="N"
+			   WIDTH="40"
+			   UPDATED="01/09/2026 15:56:53"
+			   UPDATED_BY="SADMIN"
+			   CREATED="01/09/2026 15:56:53"
+			   CREATED_BY="SADMIN">
+				<CONTROL_LOCALE
+				   APPLICATION_CODE="STD"
+				   CAPTION="Edit"
+				   INACTIVE="N"
+				   LANGUAGE_CODE="ENU"
+				   NAME="ENU-STD"
+				   TRANSLATE="Y"
+				   VISIBLE="Y"
+				   UPDATED="01/09/2026 15:59:41"
+				   UPDATED_BY="SADMIN"
+				   CREATED="01/09/2026 15:59:41"
+				   CREATED_BY="SADMIN">
+				</CONTROL_LOCALE>
+			</CONTROL>
+			<CONTROL
+			   AUTOMATIC_HORIZONTAL_SCROLL="Y"
+			   AUTOMATIC_VERTICAL_SCROLL="N"
+			   DEFAULT_BUTTON="N"
+			   EXTENSION_FLAG="N"
+			   GROUP="N"
+			   HTML_DEFAULT_CONTROL="N"
+			   HTML_DISPLAY_MODE="EncodeData"
+			   HTML_ONLY="Y"
+			   HTML_ROW_SENSITIVE="Y"
+			   HTML_TYPE="MiniButtonQuery"
+			   HEIGHT="10"
+			   INACTIVE="N"
+			   LEFT="0"
+			   METHOD_INVOKED="ExecuteQuery"
+			   MULTI_LINE="N"
+			   NAME="ExecuteQuery"
+			   OWNER_DRAW="N"
+			   POPUP_EDIT="N"
+			   PROMPT="N"
+			   READ_ONLY="N"
+			   RUNTIME="N"
+			   SEQUENCE="2"
+			   SHOW_POPUP="N"
+			   SORT="Y"
+			   TAB_STOP="Y"
+			   TEXT_ALIGNMENT="Left"
+			   TEXT_ALIGNMENT-LABEL="Right"
+			   TOP="0"
+			   TYPE="PushButton"
+			   VERTICAL_SCROLL="N"
+			   VISIBLE="Y"
+			   WANT_RETURN="N"
+			   WIDTH="40"
+			   UPDATED="01/09/2026 15:56:53"
+			   UPDATED_BY="SADMIN"
+			   CREATED="01/09/2026 15:56:53"
+			   CREATED_BY="SADMIN">
+				<CONTROL_LOCALE
+				   APPLICATION_CODE="STD"
+				   CAPTION="Go"
+				   INACTIVE="N"
+				   LANGUAGE_CODE="ENU"
+				   NAME="ENU-STD"
+				   TRANSLATE="Y"
+				   VISIBLE="Y"
+				   UPDATED="01/09/2026 15:59:41"
+				   UPDATED_BY="SADMIN"
+				   CREATED="01/09/2026 15:59:41"
+				   CREATED_BY="SADMIN">
+				</CONTROL_LOCALE>
+			</CONTROL>
+			<CONTROL
+			   AUTOMATIC_HORIZONTAL_SCROLL="Y"
+			   AUTOMATIC_VERTICAL_SCROLL="N"
+			   DEFAULT_BUTTON="N"
+			   EXTENSION_FLAG="N"
+			   FIELD="OrderFormType"
+			   GROUP="N"
+			   HTML_DEFAULT_CONTROL="N"
+			   HTML_DISPLAY_MODE="EncodeData"
+			   HTML_ONLY="Y"
+			   HTML_ROW_SENSITIVE="Y"
+			   HTML_TYPE="Field"
+			   HEIGHT="10"
+			   INACTIVE="N"
+			   MULTI_LINE="N"
+			   NAME="FormType"
+			   OWNER_DRAW="N"
+			   POPUP_EDIT="N"
+			   PROMPT="N"
+			   READ_ONLY="N"
+			   RUNTIME="Y"
+			   SEQUENCE="3"
+			   SHOW_POPUP="N"
+			   SORT="Y"
+			   TAB_STOP="Y"
+			   TEXT_ALIGNMENT="Left"
+			   TEXT_ALIGNMENT-LABEL="Right"
+			   TOP="0"
+			   TYPE="TextBox"
+			   VERTICAL_SCROLL="N"
+			   VISIBLE="Y"
+			   WANT_RETURN="N"
+			   WIDTH="40"
+			   UPDATED="01/09/2026 15:56:53"
+			   UPDATED_BY="SADMIN"
+			   CREATED="01/09/2026 15:56:53"
+			   CREATED_BY="SADMIN">
+				<CONTROL_LOCALE
+				   APPLICATION_CODE="STD"
+				   CAPTION="Form Type"
+				   INACTIVE="N"
+				   LANGUAGE_CODE="ENU"
+				   NAME="ENU-STD"
+				   TRANSLATE="Y"
+				   VISIBLE="Y"
+				   UPDATED="01/09/2026 15:59:41"
+				   UPDATED_BY="SADMIN"
+				   CREATED="01/09/2026 15:59:41"
+				   CREATED_BY="SADMIN">
+				</CONTROL_LOCALE>
+			</CONTROL>
+			<CONTROL
+			   AUTOMATIC_HORIZONTAL_SCROLL="Y"
+			   AUTOMATIC_VERTICAL_SCROLL="N"
+			   DEFAULT_BUTTON="N"
+			   EXTENSION_FLAG="N"
+			   GROUP="N"
+			   HTML_DEFAULT_CONTROL="N"
+			   HTML_DISPLAY_MODE="EncodeData"
+			   HTML_ONLY="Y"
+			   HTML_ROW_SENSITIVE="Y"
+			   HTML_TYPE="MiniButton"
+			   HEIGHT="10"
+			   INACTIVE="N"
+			   METHOD_INVOKED="GenerateContract"
+			   MULTI_LINE="N"
+			   NAME="GenerateForm"
+			   OWNER_DRAW="N"
+			   POPUP_EDIT="N"
+			   PROMPT="N"
+			   READ_ONLY="N"
+			   RUNTIME="N"
+			   SEQUENCE="4"
+			   SHOW_POPUP="N"
+			   SORT="Y"
+			   TAB_STOP="Y"
+			   TEXT_ALIGNMENT="Left"
+			   TEXT_ALIGNMENT-LABEL="Right"
+			   TOP="0"
+			   TYPE="TextBox"
+			   VERTICAL_SCROLL="N"
+			   VISIBLE="Y"
+			   WANT_RETURN="N"
+			   WIDTH="40"
+			   UPDATED="01/09/2026 15:56:53"
+			   UPDATED_BY="SADMIN"
+			   CREATED="01/09/2026 15:56:53"
+			   CREATED_BY="SADMIN">
+				<CONTROL_LOCALE
+				   APPLICATION_CODE="STD"
+				   CAPTION="Generate contract"
+				   INACTIVE="N"
+				   LANGUAGE_CODE="ENU"
+				   NAME="ENU-STD"
+				   TRANSLATE="Y"
+				   VISIBLE="Y"
+				   UPDATED="02/05/2026 03:37:45"
+				   UPDATED_BY="VENKATESHY"
+				   CREATED="01/09/2026 15:59:41"
+				   CREATED_BY="SADMIN">
+				</CONTROL_LOCALE>
+			</CONTROL>
+			<CONTROL
+			   AUTOMATIC_HORIZONTAL_SCROLL="Y"
+			   AUTOMATIC_VERTICAL_SCROLL="N"
+			   DEFAULT_BUTTON="N"
+			   EXTENSION_FLAG="N"
+			   GROUP="N"
+			   HTML_DEFAULT_CONTROL="N"
+			   HTML_DISPLAY_MODE="EncodeData"
+			   HTML_ONLY="Y"
+			   HTML_ROW_SENSITIVE="Y"
+			   HTML_TYPE="Label"
+			   HEIGHT="10"
+			   INACTIVE="N"
+			   MULTI_LINE="N"
+			   NAME="HTML Label"
+			   OWNER_DRAW="N"
+			   POPUP_EDIT="N"
+			   PROMPT="N"
+			   READ_ONLY="N"
+			   RUNTIME="N"
+			   SEQUENCE="27"
+			   SHOW_POPUP="N"
+			   SORT="Y"
+			   TAB_STOP="Y"
+			   TEXT_ALIGNMENT="Left"
+			   TEXT_ALIGNMENT-LABEL="Right"
+			   TOP="0"
+			   TYPE="TextBox"
+			   VERTICAL_SCROLL="N"
+			   VISIBLE="Y"
+			   WANT_RETURN="N"
+			   WIDTH="40"
+			   UPDATED="01/09/2026 15:56:53"
+			   UPDATED_BY="SADMIN"
+			   CREATED="01/09/2026 15:56:53"
+			   CREATED_BY="SADMIN">
+				<CONTROL_LOCALE
+				   APPLICATION_CODE="STD"
+				   CAPTION="&lt;br/&gt;&lt;img src=&apos;images/icon_warning.gif&apos;/&gt;Contract cannot be generated because your credit check status is not approved or you have exceeded the number of services you can connect. Please review the credit check status and take the appropriate action."
+				   INACTIVE="N"
+				   LANGUAGE_CODE="ENU"
+				   NAME="ENU-STD"
+				   TRANSLATE="Y"
+				   UPDATED="01/09/2026 15:59:41"
+				   UPDATED_BY="SADMIN"
+				   CREATED="01/09/2026 15:59:41"
+				   CREATED_BY="SADMIN">
+				</CONTROL_LOCALE>
+			</CONTROL>
+			<CONTROL
+			   AUTOMATIC_HORIZONTAL_SCROLL="Y"
+			   AUTOMATIC_VERTICAL_SCROLL="N"
+			   BITMAP="ROW_OFF"
+			   DEFAULT_BUTTON="N"
+			   EXTENSION_FLAG="N"
+			   GROUP="N"
+			   HTML_BITMAP="ROW_OFF"
+			   HTML_DEFAULT_CONTROL="N"
+			   HTML_DISABLED_BITMAP="ROW_ON"
+			   HTML_DISPLAY_MODE="EncodeData"
+			   HTML_ONLY="Y"
+			   HTML_ROW_SENSITIVE="Y"
+			   HTML_TYPE="PositionOnRow"
+			   HEIGHT="10"
+			   INACTIVE="N"
+			   METHOD_INVOKED="PositionOnRow"
+			   MULTI_LINE="N"
+			   NAME="HTML PositionOnRow"
+			   OWNER_DRAW="N"
+			   POPUP_EDIT="N"
+			   PROMPT="N"
+			   READ_ONLY="N"
+			   RUNTIME="N"
+			   SEQUENCE="24"
+			   SHOW_POPUP="N"
+			   SORT="Y"
+			   TAB_STOP="Y"
+			   TEXT_ALIGNMENT="Left"
+			   TEXT_ALIGNMENT-LABEL="Right"
+			   TOP="0"
+			   TYPE="PushButton"
+			   VERTICAL_SCROLL="N"
+			   VISIBLE="Y"
+			   WANT_RETURN="N"
+			   WIDTH="40"
+			   UPDATED="01/09/2026 15:56:53"
+			   UPDATED_BY="SADMIN"
+			   CREATED="01/09/2026 15:56:53"
+			   CREATED_BY="SADMIN">
+			</CONTROL>
+			<CONTROL
+			   AUTOMATIC_HORIZONTAL_SCROLL="Y"
+			   AUTOMATIC_VERTICAL_SCROLL="N"
+			   DEFAULT_BUTTON="N"
+			   EXTENSION_FLAG="N"
+			   GROUP="N"
+			   HTML_DEFAULT_CONTROL="N"
+			   HTML_DISPLAY_MODE="EncodeData"
+			   HTML_ONLY="Y"
+			   HTML_ROW_SENSITIVE="Y"
+			   HTML_TYPE="MiniButtonEdit"
+			   HEIGHT="10"
+			   INACTIVE="N"
+			   LEFT="0"
+			   METHOD_INVOKED="NewQuery"
+			   MULTI_LINE="N"
+			   NAME="NewQuery"
+			   OWNER_DRAW="N"
+			   POPUP_EDIT="N"
+			   PROMPT="N"
+			   READ_ONLY="N"
+			   RUNTIME="N"
+			   SEQUENCE="19"
+			   SHOW_POPUP="N"
+			   SORT="Y"
+			   TAB_STOP="Y"
+			   TEXT_ALIGNMENT="Left"
+			   TEXT_ALIGNMENT-LABEL="Right"
+			   TOP="0"
+			   TYPE="PushButton"
+			   VERTICAL_SCROLL="N"
+			   VISIBLE="Y"
+			   WANT_RETURN="N"
+			   WIDTH="40"
+			   UPDATED="01/09/2026 15:56:53"
+			   UPDATED_BY="SADMIN"
+			   CREATED="01/09/2026 15:56:53"
+			   CREATED_BY="SADMIN">
+				<CONTROL_LOCALE
+				   APPLICATION_CODE="STD"
+				   CAPTION="Query"
+				   INACTIVE="N"
+				   LANGUAGE_CODE="ENU"
+				   NAME="ENU-STD"
+				   TRANSLATE="Y"
+				   VISIBLE="Y"
+				   UPDATED="01/09/2026 15:59:41"
+				   UPDATED_BY="SADMIN"
+				   CREATED="01/09/2026 15:59:41"
+				   CREATED_BY="SADMIN">
+				</CONTROL_LOCALE>
+			</CONTROL>
+			<CONTROL
+			   AUTOMATIC_HORIZONTAL_SCROLL="Y"
+			   AUTOMATIC_VERTICAL_SCROLL="N"
+			   DEFAULT_BUTTON="N"
+			   EXTENSION_FLAG="N"
+			   GROUP="N"
+			   HTML_DEFAULT_CONTROL="N"
+			   HTML_DISPLAY_MODE="EncodeData"
+			   HTML_ONLY="Y"
+			   HTML_ROW_SENSITIVE="Y"
+			   HTML_TYPE="MiniButtonEdit"
+			   HEIGHT="10"
+			   INACTIVE="N"
+			   LEFT="0"
+			   METHOD_INVOKED="NewRecord"
+			   MULTI_LINE="N"
+			   NAME="NewRecord"
+			   OWNER_DRAW="N"
+			   POPUP_EDIT="N"
+			   PROMPT="N"
+			   READ_ONLY="N"
+			   RUNTIME="N"
+			   SEQUENCE="20"
+			   SHOW_POPUP="N"
+			   SORT="Y"
+			   TAB_STOP="Y"
+			   TEXT_ALIGNMENT="Left"
+			   TEXT_ALIGNMENT-LABEL="Right"
+			   TOP="0"
+			   TYPE="PushButton"
+			   VERTICAL_SCROLL="N"
+			   VISIBLE="Y"
+			   WANT_RETURN="N"
+			   WIDTH="40"
+			   UPDATED="01/09/2026 15:56:54"
+			   UPDATED_BY="SADMIN"
+			   CREATED="01/09/2026 15:56:54"
+			   CREATED_BY="SADMIN">
+				<CONTROL_LOCALE
+				   APPLICATION_CODE="STD"
+				   CAPTION="New"
+				   INACTIVE="N"
+				   LANGUAGE_CODE="ENU"
+				   NAME="ENU-STD"
+				   TRANSLATE="Y"
+				   VISIBLE="Y"
+				   UPDATED="01/09/2026 15:59:41"
+				   UPDATED_BY="SADMIN"
+				   CREATED="01/09/2026 15:59:41"
+				   CREATED_BY="SADMIN">
+				</CONTROL_LOCALE>
+			</CONTROL>
+			<CONTROL
+			   AUTOMATIC_HORIZONTAL_SCROLL="Y"
+			   AUTOMATIC_VERTICAL_SCROLL="N"
+			   DEFAULT_BUTTON="N"
+			   EXTENSION_FLAG="N"
+			   FIELD="OrderComments"
+			   GROUP="N"
+			   HTML_DEFAULT_CONTROL="N"
+			   HTML_DISPLAY_MODE="EncodeData"
+			   HTML_ONLY="N"
+			   HTML_ROW_SENSITIVE="Y"
+			   HTML_TYPE="Text"
+			   HEIGHT="10"
+			   INACTIVE="N"
+			   MULTI_LINE="N"
+			   NAME="OrderComments"
+			   OWNER_DRAW="N"
+			   POPUP_EDIT="N"
+			   PROMPT="N"
+			   READ_ONLY="N"
+			   RUNTIME="N"
+			   SEQUENCE="5"
+			   SHOW_POPUP="N"
+			   SORT="Y"
+			   TAB_STOP="Y"
+			   TEXT_ALIGNMENT="Left"
+			   TEXT_ALIGNMENT-LABEL="Right"
+			   TOP="0"
+			   TYPE="TextBox"
+			   VERTICAL_SCROLL="N"
+			   VISIBLE="Y"
+			   WANT_RETURN="N"
+			   WIDTH="40"
+			   UPDATED="01/09/2026 15:56:54"
+			   UPDATED_BY="SADMIN"
+			   CREATED="01/09/2026 15:56:54"
+			   CREATED_BY="SADMIN">
+				<CONTROL_LOCALE
+				   APPLICATION_CODE="STD"
+				   INACTIVE="N"
+				   LANGUAGE_CODE="ENU"
+				   NAME="ENU-STD"
+				   TRANSLATE="Y"
+				   VISIBLE="Y"
+				   UPDATED="01/09/2026 15:59:41"
+				   UPDATED_BY="SADMIN"
+				   CREATED="01/09/2026 15:59:41"
+				   CREATED_BY="SADMIN">
+				</CONTROL_LOCALE>
+			</CONTROL>
+			<CONTROL
+			   AUTOMATIC_HORIZONTAL_SCROLL="Y"
+			   AUTOMATIC_VERTICAL_SCROLL="N"
+			   DEFAULT_BUTTON="N"
+			   EXTENSION_FLAG="N"
+			   FIELD="Order Id"
+			   GROUP="N"
+			   HTML_DEFAULT_CONTROL="N"
+			   HTML_DISPLAY_MODE="EncodeData"
+			   HTML_ONLY="N"
+			   HTML_ROW_SENSITIVE="Y"
+			   HTML_TYPE="Text"
+			   HEIGHT="10"
+			   INACTIVE="N"
+			   MULTI_LINE="N"
+			   NAME="OrderId"
+			   OWNER_DRAW="N"
+			   POPUP_EDIT="N"
+			   PROMPT="N"
+			   READ_ONLY="N"
+			   RUNTIME="N"
+			   SEQUENCE="6"
+			   SHOW_POPUP="N"
+			   SORT="Y"
+			   TAB_STOP="Y"
+			   TEXT_ALIGNMENT="Left"
+			   TEXT_ALIGNMENT-LABEL="Right"
+			   TOP="0"
+			   TYPE="TextBox"
+			   VERTICAL_SCROLL="N"
+			   VISIBLE="Y"
+			   WANT_RETURN="N"
+			   WIDTH="40"
+			   UPDATED="01/09/2026 15:56:54"
+			   UPDATED_BY="SADMIN"
+			   CREATED="01/09/2026 15:56:54"
+			   CREATED_BY="SADMIN">
+				<CONTROL_LOCALE
+				   APPLICATION_CODE="STD"
+				   CAPTION="Order Id"
+				   INACTIVE="N"
+				   LANGUAGE_CODE="ENU"
+				   NAME="ENU-STD"
+				   TRANSLATE="Y"
+				   VISIBLE="Y"
+				   UPDATED="01/09/2026 15:59:41"
+				   UPDATED_BY="SADMIN"
+				   CREATED="01/09/2026 15:59:41"
+				   CREATED_BY="SADMIN">
+				</CONTROL_LOCALE>
+			</CONTROL>
+			<CONTROL
+			   AUTOMATIC_HORIZONTAL_SCROLL="Y"
+			   AUTOMATIC_VERTICAL_SCROLL="N"
+			   DEFAULT_BUTTON="N"
+			   EXTENSION_FLAG="N"
+			   GROUP="N"
+			   HTML_DEFAULT_CONTROL="N"
+			   HTML_DISPLAY_MODE="EncodeData"
+			   HTML_ONLY="N"
+			   HTML_ROW_SENSITIVE="Y"
+			   HTML_TYPE="MiniButton"
+			   HEIGHT="10"
+			   INACTIVE="N"
+			   METHOD_INVOKED="Refresh"
+			   MULTI_LINE="N"
+			   NAME="RefreshRecord"
+			   OWNER_DRAW="N"
+			   POPUP_EDIT="N"
+			   PROMPT="N"
+			   READ_ONLY="N"
+			   RUNTIME="N"
+			   SEQUENCE="7"
+			   SHOW_POPUP="N"
+			   SORT="Y"
+			   TAB_STOP="Y"
+			   TEXT_ALIGNMENT="Left"
+			   TEXT_ALIGNMENT-LABEL="Right"
+			   TOP="0"
+			   TYPE="TextBox"
+			   VERTICAL_SCROLL="N"
+			   VISIBLE="Y"
+			   WANT_RETURN="N"
+			   WIDTH="40"
+			   UPDATED="01/09/2026 15:56:54"
+			   UPDATED_BY="SADMIN"
+			   CREATED="01/09/2026 15:56:54"
+			   CREATED_BY="SADMIN">
+				<CONTROL_LOCALE
+				   APPLICATION_CODE="STD"
+				   CAPTION="Refresh"
+				   INACTIVE="N"
+				   LANGUAGE_CODE="ENU"
+				   NAME="ENU-STD"
+				   TRANSLATE="Y"
+				   UPDATED="01/09/2026 15:59:41"
+				   UPDATED_BY="SADMIN"
+				   CREATED="01/09/2026 15:59:41"
+				   CREATED_BY="SADMIN">
+				</CONTROL_LOCALE>
+			</CONTROL>
+			<CONTROL
+			   AUTOMATIC_HORIZONTAL_SCROLL="Y"
+			   AUTOMATIC_VERTICAL_SCROLL="N"
+			   DEFAULT_BUTTON="N"
+			   EXTENSION_FLAG="N"
+			   GROUP="N"
+			   HTML_DEFAULT_CONTROL="N"
+			   HTML_DISPLAY_MODE="EncodeData"
+			   HTML_ONLY="Y"
+			   HTML_ROW_SENSITIVE="Y"
+			   HTML_TYPE="MiniButtonEditNew"
+			   HEIGHT="10"
+			   INACTIVE="N"
+			   LEFT="0"
+			   METHOD_INVOKED="ResetRecord"
+			   MULTI_LINE="N"
+			   NAME="ResetRecord"
+			   OWNER_DRAW="N"
+			   POPUP_EDIT="N"
+			   PROMPT="N"
+			   READ_ONLY="N"
+			   RUNTIME="N"
+			   SEQUENCE="21"
+			   SHOW_POPUP="N"
+			   SORT="Y"
+			   TAB_STOP="Y"
+			   TEXT_ALIGNMENT="Left"
+			   TEXT_ALIGNMENT-LABEL="Right"
+			   TOP="0"
+			   TYPE="PushButton"
+			   VERTICAL_SCROLL="N"
+			   VISIBLE="Y"
+			   WANT_RETURN="N"
+			   WIDTH="40"
+			   UPDATED="01/09/2026 15:56:54"
+			   UPDATED_BY="SADMIN"
+			   CREATED="01/09/2026 15:56:54"
+			   CREATED_BY="SADMIN">
+				<CONTROL_LOCALE
+				   APPLICATION_CODE="STD"
+				   CAPTION="Reset"
+				   INACTIVE="N"
+				   LANGUAGE_CODE="ENU"
+				   NAME="ENU-STD"
+				   TRANSLATE="Y"
+				   VISIBLE="Y"
+				   UPDATED="01/09/2026 15:59:41"
+				   UPDATED_BY="SADMIN"
+				   CREATED="01/09/2026 15:59:41"
+				   CREATED_BY="SADMIN">
+				</CONTROL_LOCALE>
+			</CONTROL>
+			<CONTROL
+			   AUTOMATIC_HORIZONTAL_SCROLL="Y"
+			   AUTOMATIC_VERTICAL_SCROLL="N"
+			   CAPTION_-_STRING_REFERENCE="SBL_SEND_EMAIL-1004224911-0BQ"
+			   COMMENTS="JS 24042020 added for NSA Email"
+			   DEFAULT_BUTTON="N"
+			   EXTENSION_FLAG="N"
+			   GROUP="N"
+			   HTML_DEFAULT_CONTROL="N"
+			   HTML_DISPLAY_MODE="EncodeData"
+			   HTML_ONLY="Y"
+			   HTML_ROW_SENSITIVE="Y"
+			   HTML_TYPE="MiniButton"
+			   HEIGHT="24"
+			   INACTIVE="N"
+			   METHOD_INVOKED="SendEmail"
+			   MULTI_LINE="N"
+			   NAME="SendEmail"
+			   OWNER_DRAW="N"
+			   POPUP_EDIT="N"
+			   PROMPT="N"
+			   READ_ONLY="N"
+			   RUNTIME="N"
+			   SHOW_POPUP="N"
+			   SORT="Y"
+			   TAB_STOP="Y"
+			   TEXT_ALIGNMENT="Left"
+			   TEXT_ALIGNMENT-LABEL="Right"
+			   TOP="0"
+			   TYPE="TextBox"
+			   VERTICAL_SCROLL="N"
+			   VISIBLE="Y"
+			   WANT_RETURN="N"
+			   WIDTH="120"
+			   UPDATED="02/05/2026 03:37:43"
+			   UPDATED_BY="VENKATESHY"
+			   CREATED="01/09/2026 15:56:54"
+			   CREATED_BY="SADMIN">
+			</CONTROL>
+			<CONTROL
+			   AUTOMATIC_HORIZONTAL_SCROLL="Y"
+			   AUTOMATIC_VERTICAL_SCROLL="N"
+			   COMMENTS="MORE_OR_LESS_GLOBAL_CHANGE"
+			   DEFAULT_BUTTON="N"
+			   EXTENSION_FLAG="N"
+			   GROUP="N"
+			   HTML_BITMAP="BTTNS_MORE"
+			   HTML_DEFAULT_CONTROL="N"
+			   HTML_DISPLAY_MODE="EncodeData"
+			   HTML_ONLY="Y"
+			   HTML_ROW_SENSITIVE="Y"
+			   HTML_TYPE="Link"
+			   HEIGHT="24"
+			   INACTIVE="N"
+			   METHOD_INVOKED="ToggleListRowCount"
+			   MULTI_LINE="N"
+			   NAME="ToggleListRowCount"
+			   OWNER_DRAW="N"
+			   POPUP_EDIT="N"
+			   PROMPT="N"
+			   READ_ONLY="N"
+			   RUNTIME="N"
+			   SEQUENCE="8"
+			   SHOW_POPUP="N"
+			   SORT="Y"
+			   TAB_STOP="Y"
+			   TEXT_ALIGNMENT="Left"
+			   TEXT_ALIGNMENT-LABEL="Right"
+			   TOP="0"
+			   TYPE="TextBox"
+			   VERTICAL_SCROLL="N"
+			   VISIBLE="Y"
+			   WANT_RETURN="N"
+			   WIDTH="120"
+			   UPDATED="01/09/2026 15:56:54"
+			   UPDATED_BY="SADMIN"
+			   CREATED="01/09/2026 15:56:54"
+			   CREATED_BY="SADMIN">
+			</CONTROL>
+			<CONTROL
+			   AUTOMATIC_HORIZONTAL_SCROLL="Y"
+			   AUTOMATIC_VERTICAL_SCROLL="N"
+			   COMMENTS="UndoQuery control created during Template Merge"
+			   DEFAULT_BUTTON="N"
+			   EXTENSION_FLAG="N"
+			   GROUP="N"
+			   HTML_DEFAULT_CONTROL="N"
+			   HTML_DISPLAY_MODE="EncodeData"
+			   HTML_ONLY="N"
+			   HTML_ROW_SENSITIVE="Y"
+			   HTML_TYPE="MiniButtonQuery"
+			   HEIGHT="10"
+			   INACTIVE="N"
+			   METHOD_INVOKED="UndoQuery"
+			   MULTI_LINE="N"
+			   NAME="UndoQuery"
+			   OWNER_DRAW="N"
+			   POPUP_EDIT="N"
+			   PROMPT="N"
+			   READ_ONLY="N"
+			   RUNTIME="N"
+			   SEQUENCE="9"
+			   SHOW_POPUP="N"
+			   SORT="Y"
+			   TAB_STOP="Y"
+			   TEXT_ALIGNMENT="Left"
+			   TEXT_ALIGNMENT-LABEL="Right"
+			   TOP="0"
+			   TYPE="PushButton"
+			   VERTICAL_SCROLL="N"
+			   VISIBLE="Y"
+			   WANT_RETURN="N"
+			   WIDTH="40"
+			   UPDATED="01/09/2026 15:56:54"
+			   UPDATED_BY="SADMIN"
+			   CREATED="01/09/2026 15:56:54"
+			   CREATED_BY="SADMIN">
+				<CONTROL_LOCALE
+				   APPLICATION_CODE="STD"
+				   CAPTION="Cancel"
+				   INACTIVE="N"
+				   LANGUAGE_CODE="ENU"
+				   NAME="ENU-STD"
+				   TRANSLATE="Y"
+				   VISIBLE="Y"
+				   UPDATED="01/09/2026 15:59:41"
+				   UPDATED_BY="SADMIN"
+				   CREATED="01/09/2026 15:59:41"
+				   CREATED_BY="SADMIN">
+				</CONTROL_LOCALE>
+			</CONTROL>
+			<CONTROL
+			   AUTOMATIC_HORIZONTAL_SCROLL="Y"
+			   AUTOMATIC_VERTICAL_SCROLL="N"
+			   DEFAULT_BUTTON="N"
+			   EXTENSION_FLAG="N"
+			   GROUP="N"
+			   HTML_DEFAULT_CONTROL="N"
+			   HTML_DISPLAY_MODE="EncodeData"
+			   HTML_ONLY="Y"
+			   HTML_ROW_SENSITIVE="Y"
+			   HTML_TYPE="MiniButtonEditNew"
+			   HEIGHT="10"
+			   INACTIVE="N"
+			   LEFT="0"
+			   METHOD_INVOKED="UndoRecord"
+			   MULTI_LINE="N"
+			   NAME="UndoRecord"
+			   OWNER_DRAW="N"
+			   POPUP_EDIT="N"
+			   PROMPT="N"
+			   READ_ONLY="N"
+			   RUNTIME="N"
+			   SEQUENCE="22"
+			   SHOW_POPUP="N"
+			   SORT="Y"
+			   TAB_STOP="Y"
+			   TEXT_ALIGNMENT="Left"
+			   TEXT_ALIGNMENT-LABEL="Right"
+			   TOP="0"
+			   TYPE="PushButton"
+			   VERTICAL_SCROLL="N"
+			   VISIBLE="Y"
+			   WANT_RETURN="N"
+			   WIDTH="40"
+			   UPDATED="01/09/2026 15:56:54"
+			   UPDATED_BY="SADMIN"
+			   CREATED="01/09/2026 15:56:54"
+			   CREATED_BY="SADMIN">
+				<CONTROL_LOCALE
+				   APPLICATION_CODE="STD"
+				   CAPTION="Cancel"
+				   INACTIVE="N"
+				   LANGUAGE_CODE="ENU"
+				   NAME="ENU-STD"
+				   TRANSLATE="Y"
+				   VISIBLE="Y"
+				   UPDATED="01/09/2026 15:59:41"
+				   UPDATED_BY="SADMIN"
+				   CREATED="01/09/2026 15:59:41"
+				   CREATED_BY="SADMIN">
+				</CONTROL_LOCALE>
+			</CONTROL>
+			<CONTROL
+			   AUTOMATIC_HORIZONTAL_SCROLL="Y"
+			   AUTOMATIC_VERTICAL_SCROLL="N"
+			   DEFAULT_BUTTON="N"
+			   EXTENSION_FLAG="N"
+			   GROUP="N"
+			   HTML_DEFAULT_CONTROL="N"
+			   HTML_DISPLAY_MODE="EncodeData"
+			   HTML_ONLY="Y"
+			   HTML_ROW_SENSITIVE="Y"
+			   HTML_TYPE="MiniButton"
+			   HEIGHT="24"
+			   INACTIVE="Y"
+			   METHOD_INVOKED=" NewFileAttachment"
+			   MULTI_LINE="N"
+			   NAME="UploadContract"
+			   OWNER_DRAW="N"
+			   POPUP_EDIT="N"
+			   PROMPT="N"
+			   READ_ONLY="N"
+			   RUNTIME="Y"
+			   SHOW_POPUP="N"
+			   SORT="Y"
+			   TAB_STOP="Y"
+			   TEXT_ALIGNMENT="Left"
+			   TEXT_ALIGNMENT-LABEL="Right"
+			   TOP="0"
+			   TYPE="TextBox"
+			   VERTICAL_SCROLL="N"
+			   VISIBLE="Y"
+			   WANT_RETURN="N"
+			   WIDTH="120"
+			   UPDATED="01/16/2026 22:45:57"
+			   UPDATED_BY="SHALINIK_NOT_IN"
+			   CREATED="01/16/2026 01:17:48"
+			   CREATED_BY="SHALINIK_NOT_IN">
+				<CONTROL_LOCALE
+				   APPLICATION_CODE="STD"
+				   CAPTION="Upload Signed Contract"
+				   INACTIVE="N"
+				   LANGUAGE_CODE="ENU"
+				   NAME="ENU-STD"
+				   TRANSLATE="Y"
+				   UPDATED="01/16/2026 01:17:48"
+				   UPDATED_BY="SHALINIK_NOT_IN"
+				   CREATED="01/16/2026 01:17:48"
+				   CREATED_BY="SHALINIK_NOT_IN">
+				</CONTROL_LOCALE>
+			</CONTROL>
+			<CONTROL
+			   AUTOMATIC_HORIZONTAL_SCROLL="Y"
+			   AUTOMATIC_VERTICAL_SCROLL="N"
+			   DEFAULT_BUTTON="N"
+			   EXTENSION_FLAG="N"
+			   GROUP="N"
+			   HTML_DEFAULT_CONTROL="N"
+			   HTML_DISPLAY_MODE="EncodeData"
+			   HTML_ONLY="Y"
+			   HTML_ROW_SENSITIVE="Y"
+			   HTML_TYPE="Label"
+			   HEIGHT="10"
+			   INACTIVE="N"
+			   MULTI_LINE="N"
+			   NAME="WebEditTitle"
+			   OWNER_DRAW="N"
+			   POPUP_EDIT="N"
+			   PROMPT="N"
+			   READ_ONLY="N"
+			   RUNTIME="N"
+			   SEQUENCE="10"
+			   SHOW_POPUP="N"
+			   SORT="Y"
+			   TAB_STOP="Y"
+			   TEXT_ALIGNMENT="Left"
+			   TEXT_ALIGNMENT-LABEL="Right"
+			   TOP="0"
+			   TYPE="Label"
+			   VERTICAL_SCROLL="N"
+			   VISIBLE="Y"
+			   WANT_RETURN="N"
+			   WIDTH="40"
+			   UPDATED="01/09/2026 15:56:54"
+			   UPDATED_BY="SADMIN"
+			   CREATED="01/09/2026 15:56:54"
+			   CREATED_BY="SADMIN">
+				<CONTROL_LOCALE
+				   APPLICATION_CODE="STD"
+				   CAPTION="Attachments"
+				   INACTIVE="N"
+				   LANGUAGE_CODE="ENU"
+				   NAME="ENU-STD"
+				   TRANSLATE="Y"
+				   VISIBLE="Y"
+				   UPDATED="01/09/2026 15:59:41"
+				   UPDATED_BY="SADMIN"
+				   CREATED="01/09/2026 15:59:41"
+				   CREATED_BY="SADMIN">
+				</CONTROL_LOCALE>
+			</CONTROL>
+			<CONTROL
+			   AUTOMATIC_HORIZONTAL_SCROLL="Y"
+			   AUTOMATIC_VERTICAL_SCROLL="N"
+			   DEFAULT_BUTTON="N"
+			   EXTENSION_FLAG="N"
+			   GROUP="N"
+			   HTML_DEFAULT_CONTROL="N"
+			   HTML_DISPLAY_MODE="EncodeData"
+			   HTML_ONLY="Y"
+			   HTML_ROW_SENSITIVE="Y"
+			   HTML_TYPE="Label"
+			   HEIGHT="10"
+			   INACTIVE="N"
+			   MULTI_LINE="N"
+			   NAME="WebNewTitle"
+			   OWNER_DRAW="N"
+			   POPUP_EDIT="N"
+			   PROMPT="N"
+			   READ_ONLY="N"
+			   RUNTIME="N"
+			   SEQUENCE="11"
+			   SHOW_POPUP="N"
+			   SORT="Y"
+			   TAB_STOP="Y"
+			   TEXT_ALIGNMENT="Left"
+			   TEXT_ALIGNMENT-LABEL="Right"
+			   TOP="0"
+			   TYPE="Label"
+			   VERTICAL_SCROLL="N"
+			   VISIBLE="Y"
+			   WANT_RETURN="N"
+			   WIDTH="40"
+			   UPDATED="01/09/2026 15:56:54"
+			   UPDATED_BY="SADMIN"
+			   CREATED="01/09/2026 15:56:54"
+			   CREATED_BY="SADMIN">
+				<CONTROL_LOCALE
+				   APPLICATION_CODE="STD"
+				   CAPTION="Attachment"
+				   INACTIVE="N"
+				   LANGUAGE_CODE="ENU"
+				   NAME="ENU-STD"
+				   TRANSLATE="Y"
+				   VISIBLE="Y"
+				   UPDATED="01/09/2026 15:59:41"
+				   UPDATED_BY="SADMIN"
+				   CREATED="01/09/2026 15:59:41"
+				   CREATED_BY="SADMIN">
+				</CONTROL_LOCALE>
+			</CONTROL>
+			<CONTROL
+			   AUTOMATIC_HORIZONTAL_SCROLL="Y"
+			   AUTOMATIC_VERTICAL_SCROLL="N"
+			   DEFAULT_BUTTON="N"
+			   EXTENSION_FLAG="N"
+			   GROUP="N"
+			   HTML_DEFAULT_CONTROL="N"
+			   HTML_DISPLAY_MODE="EncodeData"
+			   HTML_ONLY="Y"
+			   HTML_ROW_SENSITIVE="Y"
+			   HTML_TYPE="Label"
+			   HEIGHT="10"
+			   INACTIVE="N"
+			   MULTI_LINE="N"
+			   NAME="WebQueryLabel"
+			   OWNER_DRAW="N"
+			   POPUP_EDIT="N"
+			   PROMPT="N"
+			   READ_ONLY="N"
+			   RUNTIME="N"
+			   SEQUENCE="12"
+			   SHOW_POPUP="N"
+			   SORT="Y"
+			   TAB_STOP="Y"
+			   TEXT_ALIGNMENT="Left"
+			   TEXT_ALIGNMENT-LABEL="Right"
+			   TOP="0"
+			   TYPE="Label"
+			   VERTICAL_SCROLL="N"
+			   VISIBLE="Y"
+			   WANT_RETURN="N"
+			   WIDTH="40"
+			   UPDATED="01/09/2026 15:56:54"
+			   UPDATED_BY="SADMIN"
+			   CREATED="01/09/2026 15:56:54"
+			   CREATED_BY="SADMIN">
+				<CONTROL_LOCALE
+				   APPLICATION_CODE="STD"
+				   CAPTION="Enter Query"
+				   INACTIVE="N"
+				   LANGUAGE_CODE="ENU"
+				   NAME="ENU-STD"
+				   TRANSLATE="Y"
+				   VISIBLE="Y"
+				   UPDATED="01/09/2026 15:59:41"
+				   UPDATED_BY="SADMIN"
+				   CREATED="01/09/2026 15:59:41"
+				   CREATED_BY="SADMIN">
+				</CONTROL_LOCALE>
+			</CONTROL>
+			<CONTROL
+			   AUTOMATIC_HORIZONTAL_SCROLL="Y"
+			   AUTOMATIC_VERTICAL_SCROLL="N"
+			   DEFAULT_BUTTON="N"
+			   EXTENSION_FLAG="N"
+			   GROUP="N"
+			   HTML_DEFAULT_CONTROL="N"
+			   HTML_DISPLAY_MODE="EncodeData"
+			   HTML_ONLY="Y"
+			   HTML_ROW_SENSITIVE="Y"
+			   HTML_TYPE="Label"
+			   HEIGHT="10"
+			   INACTIVE="N"
+			   MULTI_LINE="N"
+			   NAME="WebQueryTitle"
+			   OWNER_DRAW="N"
+			   POPUP_EDIT="N"
+			   PROMPT="N"
+			   READ_ONLY="N"
+			   RUNTIME="N"
+			   SEQUENCE="13"
+			   SHOW_POPUP="N"
+			   SORT="Y"
+			   TAB_STOP="Y"
+			   TEXT_ALIGNMENT="Left"
+			   TEXT_ALIGNMENT-LABEL="Right"
+			   TOP="0"
+			   TYPE="Label"
+			   VERTICAL_SCROLL="N"
+			   VISIBLE="Y"
+			   WANT_RETURN="N"
+			   WIDTH="40"
+			   UPDATED="01/09/2026 15:56:54"
+			   UPDATED_BY="SADMIN"
+			   CREATED="01/09/2026 15:56:54"
+			   CREATED_BY="SADMIN">
+				<CONTROL_LOCALE
+				   APPLICATION_CODE="STD"
+				   CAPTION="Attachments"
+				   INACTIVE="N"
+				   LANGUAGE_CODE="ENU"
+				   NAME="ENU-STD"
+				   TRANSLATE="Y"
+				   VISIBLE="Y"
+				   UPDATED="01/09/2026 15:59:41"
+				   UPDATED_BY="SADMIN"
+				   CREATED="01/09/2026 15:59:41"
+				   CREATED_BY="SADMIN">
+				</CONTROL_LOCALE>
+			</CONTROL>
+			<CONTROL
+			   AUTOMATIC_HORIZONTAL_SCROLL="Y"
+			   AUTOMATIC_VERTICAL_SCROLL="N"
+			   DEFAULT_BUTTON="N"
+			   EXTENSION_FLAG="N"
+			   GROUP="N"
+			   HTML_DEFAULT_CONTROL="N"
+			   HTML_DISPLAY_MODE="EncodeData"
+			   HTML_ONLY="Y"
+			   HTML_ROW_SENSITIVE="Y"
+			   HTML_TYPE="MiniButtonEditNew"
+			   HEIGHT="10"
+			   INACTIVE="N"
+			   LEFT="0"
+			   METHOD_INVOKED="WriteRecord"
+			   MULTI_LINE="N"
+			   NAME="WriteRecord"
+			   OWNER_DRAW="N"
+			   POPUP_EDIT="N"
+			   PROMPT="N"
+			   READ_ONLY="N"
+			   RUNTIME="N"
+			   SEQUENCE="23"
+			   SHOW_POPUP="N"
+			   SORT="Y"
+			   TAB_STOP="Y"
+			   TEXT_ALIGNMENT="Left"
+			   TEXT_ALIGNMENT-LABEL="Right"
+			   TOP="0"
+			   TYPE="PushButton"
+			   VERTICAL_SCROLL="N"
+			   VISIBLE="Y"
+			   WANT_RETURN="N"
+			   WIDTH="40"
+			   UPDATED="01/09/2026 15:56:54"
+			   UPDATED_BY="SADMIN"
+			   CREATED="01/09/2026 15:56:54"
+			   CREATED_BY="SADMIN">
+				<CONTROL_LOCALE
+				   APPLICATION_CODE="STD"
+				   CAPTION="Save"
+				   INACTIVE="N"
+				   LANGUAGE_CODE="ENU"
+				   NAME="ENU-STD"
+				   TRANSLATE="Y"
+				   VISIBLE="Y"
+				   UPDATED="01/09/2026 15:59:41"
+				   UPDATED_BY="SADMIN"
+				   CREATED="01/09/2026 15:59:41"
+				   CREATED_BY="SADMIN">
+				</CONTROL_LOCALE>
+			</CONTROL>
+			<CONTROL
+			   AUTOMATIC_HORIZONTAL_SCROLL="Y"
+			   AUTOMATIC_VERTICAL_SCROLL="N"
+			   COMMENTS="baranwas-Renamed Blackberry to generate letter-MPP 01/09/09"
+			   DEFAULT_BUTTON="N"
+			   EXTENSION_FLAG="N"
+			   GROUP="N"
+			   HTML_DEFAULT_CONTROL="N"
+			   HTML_DISPLAY_MODE="EncodeData"
+			   HTML_ONLY="Y"
+			   HTML_ROW_SENSITIVE="Y"
+			   HTML_TYPE="MiniButton"
+			   HEIGHT="10"
+			   INACTIVE="N"
+			   METHOD_INVOKED="mGenerateLetter"
+			   MULTI_LINE="N"
+			   NAME="mGenerateLetter"
+			   OWNER_DRAW="N"
+			   POPUP_EDIT="N"
+			   PROMPT="N"
+			   READ_ONLY="N"
+			   RUNTIME="N"
+			   SEQUENCE="25"
+			   SHOW_POPUP="N"
+			   SORT="Y"
+			   TAB_STOP="Y"
+			   TEXT_ALIGNMENT="Left"
+			   TEXT_ALIGNMENT-LABEL="Right"
+			   TOP="0"
+			   TYPE="TextBox"
+			   VERTICAL_SCROLL="N"
+			   VISIBLE="Y"
+			   WANT_RETURN="N"
+			   WIDTH="40"
+			   UPDATED="01/09/2026 15:56:54"
+			   UPDATED_BY="SADMIN"
+			   CREATED="01/09/2026 15:56:54"
+			   CREATED_BY="SADMIN">
+				<CONTROL_LOCALE
+				   APPLICATION_CODE="STD"
+				   CAPTION="Generate Letter"
+				   INACTIVE="N"
+				   LANGUAGE_CODE="ENU"
+				   NAME="ENU-STD"
+				   TRANSLATE="Y"
+				   VISIBLE="Y"
+				   UPDATED="01/09/2026 15:59:41"
+				   UPDATED_BY="SADMIN"
+				   CREATED="01/09/2026 15:59:41"
+				   CREATED_BY="SADMIN">
+				</CONTROL_LOCALE>
+			</CONTROL>
+			<CONTROL
+			   AUTOMATIC_HORIZONTAL_SCROLL="Y"
+			   AUTOMATIC_VERTICAL_SCROLL="N"
+			   DEFAULT_BUTTON="N"
+			   EXTENSION_FLAG="N"
+			   GROUP="N"
+			   HTML_DEFAULT_CONTROL="N"
+			   HTML_DISPLAY_MODE="EncodeData"
+			   HTML_ONLY="Y"
+			   HTML_ROW_SENSITIVE="Y"
+			   HTML_TYPE="MiniButton"
+			   HEIGHT="10"
+			   INACTIVE="N"
+			   METHOD_INVOKED="mGenerateNSA"
+			   MULTI_LINE="N"
+			   NAME="mGenerateNSA"
+			   OWNER_DRAW="N"
+			   POPUP_EDIT="N"
+			   PROMPT="N"
+			   READ_ONLY="N"
+			   RUNTIME="N"
+			   SEQUENCE="26"
+			   SHOW_POPUP="N"
+			   SORT="Y"
+			   TAB_STOP="Y"
+			   TEXT_ALIGNMENT="Left"
+			   TEXT_ALIGNMENT-LABEL="Right"
+			   TOP="0"
+			   TYPE="TextBox"
+			   VERTICAL_SCROLL="N"
+			   VISIBLE="Y"
+			   WANT_RETURN="N"
+			   WIDTH="40"
+			   UPDATED="01/09/2026 15:56:54"
+			   UPDATED_BY="SADMIN"
+			   CREATED="01/09/2026 15:56:54"
+			   CREATED_BY="SADMIN">
+				<CONTROL_LOCALE
+				   APPLICATION_CODE="STD"
+				   CAPTION="Generate NSA"
+				   INACTIVE="N"
+				   LANGUAGE_CODE="ENU"
+				   NAME="ENU-STD"
+				   TRANSLATE="Y"
+				   VISIBLE="Y"
+				   UPDATED="01/09/2026 15:59:41"
+				   UPDATED_BY="SADMIN"
+				   CREATED="01/09/2026 15:59:41"
+				   CREATED_BY="SADMIN">
+				</CONTROL_LOCALE>
+			</CONTROL>
+			<DRILLDOWN_OBJECT
+			   HYPERLINK_FIELD="OrderFileName"
+			   INACTIVE="N"
+			   NAME="OrderFileName"
+			   SEQUENCE="1"
+			   UPDATED="01/09/2026 15:49:37"
+			   UPDATED_BY="SADMIN"
+			   CREATED="01/09/2026 15:49:37"
+			   CREATED_BY="SADMIN">
+				<DRILLDOWN_OBJECT_LOCALE
+				   APPLICATION_CODE="STD"
+				   INACTIVE="N"
+				   LANGUAGE_CODE="ENU"
+				   MENU_TEXT="Open Attachment"
+				   NAME="ENU-STD"
+				   TRANSLATE="Y"
+				   UPDATED="01/09/2026 15:49:40"
+				   UPDATED_BY="SADMIN"
+				   CREATED="01/09/2026 15:49:40"
+				   CREATED_BY="SADMIN">
+				</DRILLDOWN_OBJECT_LOCALE>
+			</DRILLDOWN_OBJECT>
+			<LIST
+			   COMMENTS="EW 02/09/2011 - Created to fix Prod Defect 14476"
+			   HTML_MULTI_ROW_EDIT="N"
+			   HTML_MULTI_ROW_SELECT="N"
+			   INACTIVE="N"
+			   NAME="List"
+			   TOTAL_DISPLAYED="N"
+			   TOTAL_REQUIRED="N"
+			   UPDATED="01/09/2026 15:49:44"
+			   UPDATED_BY="SADMIN"
+			   CREATED="01/09/2026 15:49:44"
+			   CREATED_BY="SADMIN">
+				<LIST_COLUMN
+				   AVAILABLE="Y"
+				   BITMAP_COLUMN_HEADING="N"
+				   COMMENTS="Subramanian 17SEP2014: Added order comments field, show in list is ticked off."
+				   FIELD="OrderComments"
+				   HTML_DISPLAY_MODE="EncodeData"
+				   HTML_LIST_EDIT="Y"
+				   HTML_ONLY="N"
+				   HTML_ROW_SENSITIVE="Y"
+				   HTML_TYPE="Text"
+				   INACTIVE="N"
+				   NAME="OrderComments"
+				   POPUP_EDIT="N"
+				   READ_ONLY="N"
+				   RUNTIME="N"
+				   SHOW_IN_LIST="N"
+				   SHOW_POPUP="N"
+				   TEXT_ALIGNMENT="Left"
+				   TEXT_ALIGNMENT-LABEL="Left"
+				   TOTAL_REQUIRED="N"
+				   TYPE="TextBox"
+				   WIDTH="20"
+				   UPDATED="01/09/2026 15:49:57"
+				   UPDATED_BY="SADMIN"
+				   CREATED="01/09/2026 15:49:57"
+				   CREATED_BY="SADMIN">
+					<LIST_COLUMN_LOCALE
+					   APPLICATION_CODE="STD"
+					   DISPLAY_NAME="Order Comments"
+					   INACTIVE="N"
+					   LANGUAGE_CODE="ENU"
+					   NAME="ENU-STD"
+					   TRANSLATE="Y"
+					   UPDATED="01/09/2026 15:50:23"
+					   UPDATED_BY="SADMIN"
+					   CREATED="01/09/2026 15:50:23"
+					   CREATED_BY="SADMIN">
+					</LIST_COLUMN_LOCALE>
+				</LIST_COLUMN>
+				<LIST_COLUMN
+				   AVAILABLE="Y"
+				   BITMAP_COLUMN_HEADING="N"
+				   COMMENTS="Subramanian 23.7.14 Changed text align-label to left 
+EW 02/09/2011 - Created to fix Prod Defect 14476"
+				   FIELD="OrderFileName"
+				   HTML_DISPLAY_MODE="EncodeData"
+				   HTML_LIST_EDIT="Y"
+				   HTML_ONLY="N"
+				   HTML_ROW_SENSITIVE="Y"
+				   HTML_TYPE="Text"
+				   INACTIVE="N"
+				   NAME="OrderFileName"
+				   POPUP_EDIT="N"
+				   READ_ONLY="N"
+				   RUNTIME="N"
+				   SHOW_IN_LIST="Y"
+				   SHOW_POPUP="N"
+				   TEXT_ALIGNMENT="Left"
+				   TEXT_ALIGNMENT-LABEL="Right"
+				   TOTAL_REQUIRED="N"
+				   TYPE="TextBox"
+				   WIDTH="20"
+				   UPDATED="02/27/2026 19:18:53"
+				   UPDATED_BY="VENKATESHY"
+				   CREATED="01/09/2026 15:49:57"
+				   CREATED_BY="SADMIN">
+					<LIST_COLUMN_LOCALE
+					   APPLICATION_CODE="STD"
+					   DISPLAY_NAME="Order file name"
+					   INACTIVE="N"
+					   LANGUAGE_CODE="ENU"
+					   NAME="ENU-STD"
+					   TRANSLATE="Y"
+					   UPDATED="02/05/2026 03:37:41"
+					   UPDATED_BY="VENKATESHY"
+					   CREATED="01/09/2026 15:50:23"
+					   CREATED_BY="SADMIN">
+					</LIST_COLUMN_LOCALE>
+				</LIST_COLUMN>
+			</LIST>
+		</APPLET>
+	</PROJECT>
+	<SBL_EXT_TYPE_DEF>
+		<TYPE
+		   NAME="Applet">
+			<ATTRIBUTE
+			   NAME="Responsive Flag">
+			</ATTRIBUTE>
+		</TYPE>
+		<TYPE
+		   NAME="Applet Web Template">
+			<ATTRIBUTE
+			   NAME="Ext Web Template">
+			</ATTRIBUTE>
+		</TYPE>
+		<TYPE
+		   NAME="Applet Web Template Item">
+			<ATTRIBUTE
+			   NAME="Ext Expression">
+			</ATTRIBUTE>
+			<ATTRIBUTE
+			   NAME="Group Name">
+			</ATTRIBUTE>
+			<ATTRIBUTE
+			   NAME="Html Attr">
+			</ATTRIBUTE>
+			<ATTRIBUTE
+			   NAME="Sequence">
+			</ATTRIBUTE>
+			<ATTRIBUTE
+			   NAME="Tmpl Item Holder Name">
+			</ATTRIBUTE>
+			<ATTRIBUTE
+			   NAME="Web Tmpl Name">
+			</ATTRIBUTE>
+		</TYPE>
+	</SBL_EXT_TYPE_DEF>
+</REPOSITORY>
+
+
+
