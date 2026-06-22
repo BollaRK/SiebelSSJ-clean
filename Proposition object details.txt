@@ -1,0 +1,2 @@
+Applet name: VFDFA Line Item Form Apple Propt
+View name: VF SSJ Connection Wizard View – Shopping Cart – TBUI
